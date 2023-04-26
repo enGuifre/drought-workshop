@@ -44,7 +44,7 @@
   } */
   :global(.layercake-container .tooltip)
   {
-    background-color: black;
+    background-color: grey;
   }
   :global(.axis .tick-mark) {
     font-size: .725em;
