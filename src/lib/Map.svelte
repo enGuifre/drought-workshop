@@ -32,6 +32,11 @@
   }
  
 let sensors_arr=[...new Set(sensors.map(d=>String(d.codiACA)))];
+let date = new Date();
+
+  let day = date.getDate();
+  let month = date.getMonth() + 1;
+  let year = date.getFullYear();
 
 
 
@@ -99,7 +104,7 @@ Red #F15546    - 0% to 15.9% capacity
 
   */
   let thresholdScale = {domain:[16, 25, 40, 60, 100],
-  range:['#F15546', '#F58523', '#F1EA1E', '#60BB46','#4E8AC8']
+  range:['#8993FF', '#93ACFF', '#ACCBFF', '#DBEDFF','#F4FAFF']
   }; // Set the colors for each threshold
 
 console.warn(thresholdScale)
@@ -313,12 +318,23 @@ alert('entrado')
         
       }
       
-     
+      let currentDate = `${day}/${month}/${year}`;
+      let prevDate=`${day}/${month}/${year-1}`;
+      var historical_data=historical.filter(d=>d.dia==prevDate)[0];
+      console.warn(currentDate,historical_data)
+/*
+nivell_absolut: 787.11
+perc_volume: 46.5
+volume: 37.23
+*/
       jQuery(".maplibregl-popup").show();
         //even if no votes, we popup the name of municipality
         popup.setHTML(
-          "<h3>" + selected_info_popup.NAME + "</h3><h2>" + selected_info_popup.percent + " %</h2>"+
-          "<h2>" + selected_info_popup.volume + " hm³</h2><span>Click to see more</span>"
+          "<h3>" + selected_info_popup.NAME + "</h3><center style='color:gold'>"+currentDate+"</center><h2>" + selected_info_popup.percent + " %</h2>"+
+          "<h2>" + selected_info_popup.volume + " hm³</h2></hr><center style='color:gold'>"+prevDate+"</center>"
+        +"<div>nivell_absolut: "+historical_data.nivell_absolut+"</div><div>perc_volume: "+historical_data.perc_volume+"</div>"
+        +"<div>volume: "+historical_data.volume+"</div>"
+          +"<span>Click to see more</span>"
         );
         var latlng = e.lngLat;
         popup.addTo(map);
