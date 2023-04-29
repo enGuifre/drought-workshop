@@ -193,7 +193,7 @@ export let mapStyle={
         "maxzoom": 19,
         "filter": ["all", ["in", "class", "sea", "river", "lake", "reservoir"]],
         "layout": {"visibility": "visible"},
-        "paint": {"fill-color": "rgba(174, 209, 232, 1)"}
+        "paint": {"fill-color": "rgba(63, 157, 216, 1)"}
       },
       {
         "id": "tunnel-service-track-casing",
@@ -206,7 +206,7 @@ export let mapStyle={
           ["==", "brunnel", "tunnel"],
           ["in", "class", "service", "track"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "#cfcdca",
           "line-dasharray": [0.5, 0.25],
@@ -220,7 +220,7 @@ export let mapStyle={
         "source": "openmaptiles",
         "source-layer": "transportation",
         "filter": ["all", ["==", "brunnel", "tunnel"], ["==", "class", "minor"]],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(140, 140, 140, 1)",
           "line-opacity": {"stops": [[14, 1]]},
@@ -239,7 +239,7 @@ export let mapStyle={
           ["==", "brunnel", "tunnel"],
           ["in", "class", "tertiary"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-opacity": 1,
@@ -258,7 +258,7 @@ export let mapStyle={
           ["==", "brunnel", "tunnel"],
           ["in", "class", "secondary"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-opacity": 1,
@@ -278,7 +278,7 @@ export let mapStyle={
           ["==", "brunnel", "tunnel"],
           ["in", "class", "primary", "trunk"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {"base": 1.2, "stops": [[7, 1.5], [20, 22]]},
@@ -296,7 +296,7 @@ export let mapStyle={
           ["==", "brunnel", "tunnel"],
           ["==", "class", "motorway"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-dasharray": [1, 0.75],
@@ -317,7 +317,7 @@ export let mapStyle={
           ["==", "$type", "LineString"],
           ["all", ["==", "brunnel", "tunnel"], ["==", "class", "path"]]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(158, 158, 158, 1)",
           "line-dasharray": [1.5, 0.75],
@@ -335,7 +335,7 @@ export let mapStyle={
           ["==", "brunnel", "tunnel"],
           ["in", "class", "service", "track"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(158, 158, 158, 1)",
           "line-width": {"base": 1.2, "stops": [[13, 0.1], [15, 1.2], [20, 4]]},
@@ -353,7 +353,7 @@ export let mapStyle={
           ["==", "brunnel", "tunnel"],
           ["==", "class", "pedestrian"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(180, 180, 180, 1)",
           "line-opacity": 1,
@@ -368,7 +368,7 @@ export let mapStyle={
         "source": "openmaptiles",
         "source-layer": "transportation",
         "filter": ["all", ["==", "brunnel", "tunnel"], ["==", "class", "minor"]],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(216, 216, 216, 1)",
           "line-opacity": 1,
@@ -387,7 +387,7 @@ export let mapStyle={
           ["==", "brunnel", "tunnel"],
           ["in", "class", "tertiary"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {"base": 1.2, "stops": [[6.5, 0], [7, 0.5], [20, 10]]},
@@ -405,7 +405,7 @@ export let mapStyle={
           ["==", "brunnel", "tunnel"],
           ["in", "class", "secondary"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {"base": 1.2, "stops": [[6.5, 0], [7, 0.5], [20, 10]]},
@@ -424,7 +424,7 @@ export let mapStyle={
           ["==", "brunnel", "tunnel"],
           ["in", "class", "primary", "trunk"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {"base": 1.2, "stops": [[7, 0.5], [20, 14]]},
@@ -438,7 +438,7 @@ export let mapStyle={
         "source": "openmaptiles",
         "source-layer": "transportation",
         "filter": ["all", ["==", "brunnel", "tunnel"], ["in", "class", "trunk"]],
-        "layout": {"line-join": "round"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(255, 255, 255, 1)",
           "line-width": {"base": 1.2, "stops": [[6.5, 0], [7, 0.2], [20, 6]]}
@@ -455,7 +455,7 @@ export let mapStyle={
           ["==", "brunnel", "tunnel"],
           ["==", "class", "motorway"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {"base": 1.2, "stops": [[6.5, 0], [7, 0.3], [20, 8]]}
@@ -583,7 +583,7 @@ export let mapStyle={
         "source": "openmaptiles",
         "source-layer": "transportation",
         "filter": ["==", "$type", "Polygon"],
-        "layout": {"visibility": "visible"},
+        "layout": {"visibility": "none"},
         "paint": {
           "fill-color": "hsla(0, 0%, 89%, 0.56)",
           "fill-outline-color": "rgba(240, 240, 240, 1)",
@@ -606,7 +606,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(158, 158, 158, 0)",
@@ -639,7 +639,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(158, 158, 158, 0)",
@@ -666,7 +666,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(166,105,122,1)",
@@ -688,7 +688,7 @@ export let mapStyle={
           ["==", "$type", "LineString"],
           ["all", ["!in", "brunnel", "bridge", "tunnel"], ["==", "class", "path"]]
         ],
-        "layout": {"visibility": "visible"},
+        "layout": {"visibility": "none"},
         "paint": {
           "line-color": "rgba(158, 158, 158, 1)",
           "line-dasharray": [1.5, 0.5],
@@ -705,7 +705,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(158, 158, 158, 1)",
@@ -729,7 +729,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "#fc8",
@@ -761,7 +761,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "#fea",
@@ -786,7 +786,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(180, 180, 180, 1)",
@@ -812,7 +812,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(180, 180, 180, 1)",
@@ -836,7 +836,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "butt",
           "line-join": "miter",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(33, 33, 33, 1)",
@@ -855,7 +855,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(183, 183, 183, 1)",
@@ -878,7 +878,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(216, 216, 216, 1)",
@@ -905,7 +905,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(166,105,122,1)",
@@ -927,7 +927,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(166,105,122,1)",
@@ -950,7 +950,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(166,105,122,1)",
@@ -972,7 +972,7 @@ export let mapStyle={
         "layout": {
           "line-cap": "round",
           "line-join": "round",
-          "visibility": "visible"
+          "visibility": "none"
         },
         "paint": {
           "line-color": "rgba(166,105,122,1)",
@@ -986,7 +986,7 @@ export let mapStyle={
         "source": "openmaptiles",
         "source-layer": "transportation",
         "filter": ["all", ["==", "class", "minor_limit"]],
-        "layout": {"line-cap": "round", "visibility": "visible"},
+        "layout": {"line-cap": "round", "visibility": "none"},
         "paint": {"line-color": "rgba(204, 204, 204, 1)", "line-width": 2}
       },
       {
@@ -1039,7 +1039,7 @@ export let mapStyle={
           ["==", "brunnel", "bridge"],
           ["in", "class", "pedestrian"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(175, 175, 175, 1)",
           "line-opacity": 1,
@@ -1053,7 +1053,7 @@ export let mapStyle={
         "source": "openmaptiles",
         "source-layer": "transportation",
         "filter": ["all", ["==", "brunnel", "bridge"], ["in", "class", "minor"]],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(204, 204, 204, 1)",
           "line-opacity": 1,
@@ -1071,7 +1071,7 @@ export let mapStyle={
           ["==", "brunnel", "bridge"],
           ["in", "class", "tertiary"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-opacity": 1,
@@ -1089,7 +1089,7 @@ export let mapStyle={
           ["==", "brunnel", "bridge"],
           ["in", "class", "secondary"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-opacity": 1,
@@ -1109,7 +1109,7 @@ export let mapStyle={
           ["==", "brunnel", "bridge"],
           ["in", "class", "primary", "trunk"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {
@@ -1127,7 +1127,7 @@ export let mapStyle={
         "minzoom": 6,
         "maxzoom": 19,
         "filter": ["all", ["==", "brunnel", "bridge"], ["in", "class", "trunk"]],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {
@@ -1149,7 +1149,7 @@ export let mapStyle={
           ["==", "brunnel", "bridge"],
           ["==", "class", "motorway"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {
@@ -1171,7 +1171,7 @@ export let mapStyle={
           ["==", "$type", "LineString"],
           ["all", ["==", "brunnel", "bridge"], ["==", "class", "path"]]
         ],
-        "layout": {"visibility": "visible"},
+        "layout": {"visibility": "none"},
         "paint": {
           "line-color": "#f8f4f0",
           "line-width": {"base": 1.2, "stops": [[15, 1.2], [20, 18]]}
@@ -1190,7 +1190,7 @@ export let mapStyle={
           ["==", "$type", "LineString"],
           ["all", ["==", "brunnel", "bridge"], ["==", "class", "path"]]
         ],
-        "layout": {"visibility": "visible"},
+        "layout": {"visibility": "none"},
         "paint": {
           "line-color": "#cba",
           "line-width": {"base": 1.2, "stops": [[15, 1.2], [20, 4]]},
@@ -1210,7 +1210,7 @@ export let mapStyle={
           ["==", "brunnel", "bridge"],
           ["==", "class", "motorway_link"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "#fc8",
           "line-width": {
@@ -1239,7 +1239,7 @@ export let mapStyle={
             "trunk_link"
           ]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "#fea",
           "line-width": {
@@ -1261,7 +1261,7 @@ export let mapStyle={
           ["==", "brunnel", "bridge"],
           ["in", "class", "pedestrian"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(180, 180, 180, 1)",
           "line-opacity": 1,
@@ -1275,7 +1275,7 @@ export let mapStyle={
         "source": "openmaptiles",
         "source-layer": "transportation",
         "filter": ["all", ["==", "brunnel", "bridge"], ["in", "class", "minor"]],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(216, 216, 216, 1)",
           "line-opacity": 1,
@@ -1295,7 +1295,7 @@ export let mapStyle={
           ["==", "brunnel", "bridge"],
           ["in", "class", "tertiary"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {"base": 1.2, "stops": [[6.5, 0], [7, 0.5], [20, 13]]}
@@ -1314,7 +1314,7 @@ export let mapStyle={
           ["==", "brunnel", "bridge"],
           ["in", "class", "secondary"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {"base": 1.2, "stops": [[6.5, 0], [7, 0.5], [20, 13]]}
@@ -1333,7 +1333,7 @@ export let mapStyle={
           ["==", "brunnel", "bridge"],
           ["in", "class", "primary"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {"base": 1.2, "stops": [[6.5, 0], [7, 0.5], [20, 14]]}
@@ -1348,7 +1348,7 @@ export let mapStyle={
         "minzoom": 6,
         "maxzoom": 19,
         "filter": ["all", ["==", "brunnel", "bridge"], ["in", "class", "trunk"]],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {"base": 1.2, "stops": [[6.5, 0], [7, 0.2], [20, 6]]}
@@ -1367,7 +1367,7 @@ export let mapStyle={
           ["==", "brunnel", "bridge"],
           ["==", "class", "motorway"]
         ],
-        "layout": {"line-join": "round", "visibility": "visible"},
+        "layout": {"line-join": "round", "visibility": "none"},
         "paint": {
           "line-color": "rgba(166,105,122,1)",
           "line-width": {"base": 1.2, "stops": [[6.5, 0], [7, 0.3], [20, 8]]}
@@ -1388,7 +1388,7 @@ export let mapStyle={
           ["!has", "highspeed"],
           ["==", "subclass", "rack"]
         ],
-        "layout": {"visibility": "visible"},
+        "layout": {"visibility": "none"},
         "paint": {
           "line-color": "rgba(70, 70, 70, 1)",
           "line-width": {"base": 1.4, "stops": [[1, 1], [15, 1.5], [20, 2]]}
@@ -1419,7 +1419,7 @@ export let mapStyle={
             "tram"
           ]
         ],
-        "layout": {"visibility": "visible"},
+        "layout": {"visibility": "none"},
         "paint": {
           "line-color": "rgba(70, 70, 70, 1)",
           "line-width": {"base": 1.4, "stops": [[1, 1], [15, 1.5], [20, 2]]}
@@ -1449,7 +1449,7 @@ export let mapStyle={
             "betline"
           ]
         ],
-        "layout": {"visibility": "visible"},
+        "layout": {"visibility": "none"},
         "paint": {
           "line-color": "rgba(70, 70, 70, 1)",
           "line-dasharray": [0.2, 8],
