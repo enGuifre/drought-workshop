@@ -1,9 +1,18 @@
 <script>
   
   import MapSection from "./lib/MapSection.svelte";
-  
+  /* import { api } from '../services/api.js'; */
+  import { onMount } from 'svelte';
   let w;
+  let api_data;
+ 
+onMount(async () => {
+  const response = await fetch('http://aca-web.gencat.cat/sdim2/apirest/data/EMBASSAMENT-EST');
+  let f = await response.json();
+  api_data=f.sensors;
   
+
+})
 </script>
 
 
@@ -12,8 +21,16 @@
    
   
   <section>
-   
-    <MapSection />
+
+    {#if api_data}
+    <MapSection {api_data}/>
+    {/if}
+    { #if !api_data}
+    <div>Loading...</div>
+    {/if}
+    
+ 
+    
   </section>
   
 

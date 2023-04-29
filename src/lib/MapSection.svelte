@@ -1,35 +1,18 @@
 <script>
   import Map from "./Map.svelte";
+  import Map_compare from "./Map_compare.svelte";
   import * as d3 from "d3";
-  
+  export let api_data;
 </script>
 
 
 
 
-<Map/>
+<Map {api_data}/>
+<!-- <Map_compare/> -->
 
 <style>
-  .story-buttons {
-    margin: 15px 0;
-    display: flex;
-    justify-content: center;
-    column-gap: 5px;
-  }
-  .btn-active {
-    background: #888;
-  }
-  :global(.next_year) {
-    margin-top: 5px;
-    color: orange;
-    cursor: pointer;
-  }
-  .forms {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 10px;
-    padding: 10px;
-  }
+  
   :global(.maplibregl-control-container) {
     z-index: 99999999;
   }

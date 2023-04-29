@@ -7,9 +7,17 @@
   import * as d3 from "d3";
   import jQuery from "jquery";
 
+
   /* import { munis } from "../data/municipis.js"; */
   import { dams_centroid } from "../data/dams_centroid.js";
   import { dams_polygon } from "../data/dams_polygon.js";
+  import  historical  from "../data/historical.json";
+  import  sensors  from "../data/sensors.json";
+  import { mapStyle } from "../data/mapStyle.js";
+  import App from "../App.svelte";
+
+  
+  export let api_data;
 
   let map;
 
@@ -22,22 +30,71 @@
   function showOverlayFunc(){
     showOverlay=true;
   }
-  function generateRandom(maxLimit = 100){
-  let rand = Math.random() * maxLimit;
-  console.log(rand); // say 99.81321410836433
-
-  rand = Math.floor(rand); // 99
-
-  return rand;
-}
-
-  dams_centroid.features.forEach((d) => {
-    d.properties["percent"] =generateRandom();
-  });
-
-  let min_max = d3.extent(dams_centroid.features, (d) => d.properties.percent);
-  $:selected_info=null;
  
+let sensors_arr=[...new Set(sensors.map(d=>String(d.codiACA)))];
+
+
+
+let visible_centroids=dams_centroid.features.filter((d)=>sensors_arr.indexOf(String(d.properties.CODI_ACA))>-1);
+
+visible_centroids.map((d) => {
+   let sensor=sensors.filter((s)=>s.codiACA==d.properties.CODI_ACA);
+   d.properties.sensors=[...sensor];
+   
+  })
+  visible_centroids.map((d) => {
+    /*
+sensors
+[
+{"sensor":"CALC000698","observations":[{"value":"18.876","timestamp":"29/04/2023T09:50:00","location":""}]}
+    */
+   
+    d.properties.sensors.forEach(element => {
+      let sensor_data=api_data.filter((s)=>{
+      let filtered_api_data=sensors.filter((s)=>s.sensor==element.sensor)[0];
+     
+      return s.sensor==element.sensor;
+      })[0];
+      
+      if (element.description.includes('Percentatge'))
+      {
+        d.properties.percent=+sensor_data.observations[0].value;
+      }
+      else
+      {
+        d.properties.volume=+sensor_data.observations[0].value;
+      }
+      element.observations=sensor_data.observations;
+    
+    });
+    
+  })
+
+ 
+
+  let min_max_percent = d3.extent(visible_centroids, (d) => d.properties.percent);
+  let min_max_volume = d3.extent(visible_centroids, (d) => d.properties.volume);
+  
+  $:selected_info=null;
+
+  let status=[{
+    label:'Very low',
+    max:10,
+  },
+  {
+    label:'Low',
+    max:10,
+  },
+  {
+    label:'Very low',
+    max:10,
+  }]
+ 
+  let thresholdScale = {domain:[10, 20, 50, 80, 100],
+  range:['#e8472e', '#e8942e', '#156136', '#154861','#1197d9']
+  }; // Set the colors for each threshold
+
+console.warn(thresholdScale)
   let selected_data=selected_info?selected_info:null;
   
   function update_clicked()
@@ -47,36 +104,15 @@
   }
   onMount(() => {
     const data = [];
+
+    
+    
+
     
     map = new Map({
       container: "map", // container id
       //style: 'mapbox://styles/mapbox/streets-v8',
-      style: {
-        version: 8,
-        sources: {
-          geoserver: {
-            type: "vector",
-            tiles: [
-              "https://geospatial.jrc.ec.europa.eu/geoserver/gwc/service/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=hotspots:gaul_0_simplified&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/vnd.mapbox-vector-tile&TILECOL={x}&TILEROW={y}",
-            ],
-          },
-        },
-        layers: [
-          {
-            id: "gaul_0_simple",
-            source: "geoserver",
-            "source-layer": "gaul_0_simplified",
-            type: "fill",
-            // "minzoom": 4,
-            // "maxzoom": 6,
-            paint: {
-              "fill-color": "#212324",
-              "fill-outline-color": "#87989c",
-              "fill-opacity": 1,
-            },
-          },
-        ],
-      },
+      style: mapStyle,
        center:[1.05, 41.4],
        //center:[2.423955,41.960341],
 
@@ -95,43 +131,7 @@
     map.on("load", function () {
       map.addControl(new NavigationControl(), "top-right");
 
-      map.addSource("maptiler_winter_source", {
-        "type": "raster",
-        "tiles": ["https://api.maptiler.com/maps/winter/{z}/{x}/{y}.png?key=PfeqCqeOXLcGceolGsUb"],
 
-        //"tiles":["https://api.maptiler.com/maps/pastel/{z}/{x}/{y}.png?key=PfeqCqeOXLcGceolGsUb"],
-
-        'tileSize': 512
-    });
-
-    let maptiler_winter = {
-        active: false,
-        'id': 'maptiler_winter',
-        'type': 'raster',
-        'source': 'maptiler_winter_source',
-
-    }
-
-    /*   map.addSource("black_cartodb", {
-        "type": "raster",
-        "tiles": ["https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"],
-        //"tiles":["https://api.maptiler.com/maps/pastel/{z}/{x}/{y}.png?key=PfeqCqeOXLcGceolGsUb"],
-
-        'tileSize': 512
-    });
-
-    let black_cartodb = {
-        active: true,
-        'id': 'black_cartodb',
-        'type': 'raster',
-        'source': 'black_cartodb',
-        'layout': {
-            // Make the layer visible by default.
-            'visibility': 'visible'
-        },
-
-    } */
-    map.addLayer(maptiler_winter)
 
       //it has to go after load!
       map.addSource('dams_pol_source', {
@@ -157,8 +157,38 @@
 
       map.addSource('dams_point_source', {
                     'type': 'geojson',
-                    'data': dams_centroid
+                    'data': {
+                    "type": "FeatureCollection",
+                    "name": "dams_centroid",
+                    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                    "features":
+                    visible_centroids
+                    }
                     });
+
+                  /*   map.setPaintProperty(
+                        // 'slumaps_nairobi_city',
+                        'mining_data',
+                        "fill-color", style.reduce(function(memo, val, i) {
+                            memo.stops.push([val.name, val.color])
+                            return memo;
+                        }, {
+                            "property": this_app.active_cat,
+                            "type": "categorical",
+                            "stops": []
+                        })
+                        //.push('#fff')
+                    ) */
+
+//let thresholdScale = {domain:[10, 20, 50, 80, 100],                    
+let expression=[
+          "interpolate", ["linear"],
+            ["get", "percent"]
+        ]
+        thresholdScale.domain.forEach((d,i)=>{
+        
+          expression.push(d,thresholdScale.range[i])
+        })
 
     let dams_point_layer=  {
        'id': 'dams_point_layer',
@@ -167,21 +197,29 @@
         'paint': {
            "circle-radius": [
             "interpolate", ["linear"],
-            ["get", "percent"],
-            min_max[0],
-            (2/map.getZoom()),
-            min_max[1],
-            (5/map.getZoom())*20,
+            ["get", "volume"],
+          
+           min_max_volume[0],
+            (2/map.getZoom()*20),
+            min_max_volume[1],
+            (2/map.getZoom())*40, 
         ],
-          'circle-color':'#1E90FF',
+        "circle-color": expression,
+        /*    "circle-color": {
+                            "property": 'percent',
+                            "type": "categorical",
+                            "stops":
+                             thresholdScale.domain.map(d=>[d,thresholdScale.range[thresholdScale.domain.indexOf(d)]])
+           }, */
+                        
           "circle-stroke-width": 2,
-        "circle-stroke-color": "#c49435",
-        "circle-opacity": 0.4,
+        "circle-stroke-color": "white",
+        "circle-opacity": 1,
 
         }
       }
       map.addLayer(dams_point_layer);
-
+  console.warn(map.getStyle().layers)
    
     });
 
@@ -205,8 +243,8 @@
       closeOnClick: true,
       
       offset: {
-        bottom: [0, -20],
-        top: [0, 15],
+        bottom: [0, 0],
+        top: [0, 0],
         "top-left": [0, 0], //[linearOffset, (markerHeight - markerRadius - linearOffset) * -1],
         "top-right": [0, 0], //[-linearOffset, (markerHeight - markerRadius - linearOffset) * -1],
       },
@@ -233,8 +271,11 @@
       
     })
 
+ /*    map.on("mouseenter", 'dams_point_layer',function (e) {
 
-    map.on("mousemove", function (e) {
+alert('entrado')
+    }) */
+    map.on("mousemove", 'dams_point_layer',function (e) {
 
       let selected_info_popup;
       var features = map.queryRenderedFeatures(e.point, {
@@ -261,12 +302,13 @@
         selected_info_popup=dams_centroid.features.filter(d=>d.properties.CODI_ACA==selected_info_popup.CODI_ACA)[0].properties;
         
       }
-      console.info(selected_info_popup,clicked_code)
+      
      
       jQuery(".maplibregl-popup").show();
         //even if no votes, we popup the name of municipality
         popup.setHTML(
-          "<h3>" + selected_info_popup.NAME + "</h3><h2>" + selected_info_popup.percent + "%</h2><span>Click to see more</span>"
+          "<h3>" + selected_info_popup.NAME + "</h3><h2>" + selected_info_popup.percent + " %</h2>"+
+          "<h2>" + selected_info_popup.volume + " hm³</h2><span>Click to see more</span>"
         );
         var latlng = e.lngLat;
         popup.addTo(map);
@@ -302,12 +344,7 @@
 </div>
 
 <style>
-  .yearbtn {
-    padding: 5px;
-  }
-  .btn-active {
-    background: #888;
-  }
+
 
   .map-overlay {
     position: absolute;
@@ -323,26 +360,6 @@
     font-size: 13px;
   }
 
-  .story ul {
-    list-style-type: none;
-    padding: 5px;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    row-gap: 10px;
-  }
-
-  .story ul li {
-    display: contents;
-  }
-  .story .voted-proportion {
-    text-align: right;
-  }
-  .story .party-name {
-    text-align: left;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
 
   .map-wrap {
     position: absolute!important;
@@ -356,19 +373,5 @@
     background:#282856;
   }
 
-  /* .watermark {
-    position: absolute;
-    left: 10px;
-    bottom: 10px;
-    z-index: 999;
-  }
 
-  .mapboxgl-popup,
-  .maplibregl-popup {
-    z-index: 111111111 !important;
-  }
-  .legendWrapper path.domain,
-  .legendWrapper line {
-    opacity: 0;
-  } */
 </style>
