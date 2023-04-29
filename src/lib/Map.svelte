@@ -16,6 +16,7 @@
   import  sensors  from "../data/sensors.json";
   import { mapStyle } from "../data/mapStyle.js";
   import App from "../App.svelte";
+  import { each } from "svelte/internal";
 
   
   export let api_data;
@@ -84,7 +85,7 @@ sensors
   $:selected_info=null;
   $:bbox_pol=null;
   
-
+//month_historical_data=historical.filter(d=>String(d.codi)==String(selected_info.CODI_ACA)).filter(d=>String(d.dia.split('/')[0]+'/'+d.dia.split('/')[1])==String(day+'/'+month));
   let status=[{
     label:'Very low',
     max:10,
@@ -107,10 +108,11 @@ Red #F15546    - 0% to 15.9% capacity
 
   */
   let thresholdScale = {domain:[16, 25, 40, 60, 100],
-  range:['#8993FF', '#93ACFF', '#ACCBFF', '#DBEDFF','#F4FAFF']
+  range:['#CCDFFF', '#A3B8FF', '#616EFF', '#3846D6','#2C3696']
   }; // Set the colors for each threshold
 
 console.warn(thresholdScale)
+let month_historical_data;
   let selected_data=selected_info?selected_info:null;
   function satellite()
   {
@@ -327,6 +329,32 @@ let expression=[
       {
       
       selected_info=features[0].properties;
+      let date = new Date();
+
+  let day = date.getDate();
+  let month = date.getMonth() + 1;
+  let year = date.getFullYear();
+      let currentDate = `${day}/${month}/${year}`;
+      let prevDate=`${day}/${month}/${year-1}`;
+
+      console.warn(historical.filter(d=>String(d.codi)==String(selected_info.CODI_ACA)))
+       month_historical_data=historical.filter(d=>String(d.codi)==String(selected_info.CODI_ACA)).filter(d=>String(d.dia.split('/')[0]+'/'+d.dia.split('/')[1])==String(day+'/'+month));
+
+       var html=month_historical_data.map(d=>{
+          return `<div class="row">
+          <div class="col-6">
+          ${d.dia}
+          </div>
+          <div class="col-6">
+          ${d.volume}
+          </div>
+          </div>`
+        }).join('');
+        console.warn(html)
+        jQuery('.month_history').html('<h2>test</h2>')
+       
+       
+      console.warn(month_historical_data)
       }
       else
       {
@@ -347,7 +375,7 @@ alert('entrado')
       var features = map.queryRenderedFeatures(e.point, {
                     layers: ['dams_pol_layer','dams_point_layer']
                 });
-      console.log(features)
+      
       if (features && features.length>0)
       {
         //selected_info=features[0].properties;
@@ -368,11 +396,16 @@ alert('entrado')
         selected_info_popup=dams_centroid.features.filter(d=>d.properties.CODI_ACA==selected_info_popup.CODI_ACA)[0].properties;
         
       }
-      
+      let date = new Date();
+
+  let day = date.getDate();
+  let month = date.getMonth() + 1;
+  let year = date.getFullYear();
       let currentDate = `${day}/${month}/${year}`;
       let prevDate=`${day}/${month}/${year-1}`;
       var historical_data=historical.filter(d=>d.dia==prevDate)[0];
-      console.warn(currentDate,historical_data)
+
+      
 /*
 nivell_absolut: 787.11
 perc_volume: 46.5
@@ -412,6 +445,11 @@ volume: 37.23
         <h3>{selected_info.NAME}</h3>
         <ul>
           <li>Codi {selected_info.CODI_ACA}</li>
+          <ul class='month_history'>
+          <!--   {each month_historical_data as month_historical_datum}
+              <li>{month_historical_datum.dia} {month_historical_datum.nivell_absolut}</li>
+            {/each} -->
+          </ul>
           <button on:click={satellite} class="satellite">Zoom & Satellite</button>
         </ul>
        
