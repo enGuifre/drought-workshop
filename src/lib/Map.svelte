@@ -90,8 +90,16 @@ sensors
     max:10,
   }]
  
-  let thresholdScale = {domain:[10, 20, 50, 80, 100],
-  range:['#e8472e', '#e8942e', '#156136', '#154861','#1197d9']
+ /* 
+  Blue #4E8AC8   -  60% to 100% capacity
+Green #60BB46   - 40% to 59.9% capacity
+Yellow #F1EA1E    - 25% to 39.9% capacity
+Orange #F58523     - 16% to 24.9% capacity
+Red #F15546    - 0% to 15.9% capacity
+
+  */
+  let thresholdScale = {domain:[16, 25, 40, 60, 100],
+  range:['#F15546', '#F58523', '#F1EA1E', '#60BB46','#4E8AC8']
   }; // Set the colors for each threshold
 
 console.warn(thresholdScale)
@@ -117,11 +125,13 @@ console.warn(thresholdScale)
        //center:[2.423955,41.960341],
 
       //center: [141.15448379999998, 39.702053　],
-      zoom: 5,
+      zoom: 7,
       //maxBounds:[[-0.665553,40.45029], [2.276123,42.462188]],
-      maxBounds: [
-        [-0.37, 40.3],
-        [3.6, 42.8],
+    maxBounds: [
+    
+    [-2.65, 40.328],
+    [4.6, 43.0272222003790]
+        
       ],
 
       attributionControl: false,
