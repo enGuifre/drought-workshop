@@ -11,6 +11,7 @@
   /* import { munis } from "../data/municipis.js"; */
   import { dams_centroid } from "../data/dams_centroid.js";
   import { dams_polygon } from "../data/dams_polygon.js";
+  import { dams_bbox } from "../data/dams_bbox.js";
   import  historical  from "../data/historical.json";
   import  sensors  from "../data/sensors.json";
   import { mapStyle } from "../data/mapStyle.js";
@@ -20,7 +21,7 @@
   export let api_data;
 
   let map;
-
+  let icgc_sat;
   export let selectedDam;
   
   
@@ -81,6 +82,8 @@ sensors
   let min_max_volume = d3.extent(visible_centroids, (d) => d.properties.volume);
   
   $:selected_info=null;
+  $:bbox_pol=null;
+  
 
   let status=[{
     label:'Very low',
@@ -109,11 +112,41 @@ Red #F15546    - 0% to 15.9% capacity
 
 console.warn(thresholdScale)
   let selected_data=selected_info?selected_info:null;
-  
+  function satellite()
+  {
+      
+    var bbox_pol=dams_bbox.features.filter(d=>String(d.properties.CODI_ACA)==String(selected_info.CODI_ACA))[0];
+   
+    let coords=bbox_pol.geometry.coordinates[0][0];
+   
+    map.fitBounds([
+      coords[0], // southwestern corner of the bounds
+      coords[1] // northeastern corner of the bounds
+      ]);
+    
+    if (!map.getLayer('icgc_sat'))
+    {
+map.addLayer(icgc_sat, 'dams_point_layer');      
+
+      }
+
+          /*
+       The [lng, lat] pairs are the southwestern and northeastern
+*  corners of the specified geographical bounds.
+
+document.getElementById('fit').addEventListener('click', () => {
+map.fitBounds([
+[32.958984, -5.353521], // southwestern corner of the bounds
+[43.50585, 5.615985] // northeastern corner of the bounds
+]);
+
+     */
+  }
   function update_clicked()
   {
     console.log(selected_info)
     clicked_code=selected_info.CODI_ACA;
+    
   }
   onMount(() => {
     const data = [];
@@ -146,7 +179,24 @@ console.warn(thresholdScale)
     map.on("load", function () {
       map.addControl(new NavigationControl(), "top-right");
 
+      map.addSource('icgc_sat_source', {
+    
+    'type': 'raster',
+    'tiles': [
+      "https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2rgb&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:25831&BBOX=206985.645933014,4480000,573014.354066986,4780000&WIDTH=1020&HEIGHT=836&TIME=2015-12",
+    ],
+    'tileSize': 256,
+  
+})
 
+icgc_sat=  {
+
+  'id': 'icgc_sat',
+  
+'type': 'raster',
+'source': 'icgc_sat_source',
+'paint': {}
+}
 
       //it has to go after load!
       map.addSource('dams_pol_source', {
@@ -275,6 +325,7 @@ let expression=[
       console.log(features)
       if (features && features.length>0)
       {
+      
       selected_info=features[0].properties;
       }
       else
@@ -290,7 +341,7 @@ let expression=[
 
 alert('entrado')
     }) */
-    map.on("mousemove", 'dams_point_layer',function (e) {
+    map.on("mousemove", function (e) {
 
       let selected_info_popup;
       var features = map.queryRenderedFeatures(e.point, {
@@ -361,6 +412,7 @@ volume: 37.23
         <h3>{selected_info.NAME}</h3>
         <ul>
           <li>Codi {selected_info.CODI_ACA}</li>
+          <button on:click={satellite} class="satellite">Zoom & Satellite</button>
         </ul>
        
     </div>
