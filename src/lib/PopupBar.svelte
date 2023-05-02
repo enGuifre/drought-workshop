@@ -32,9 +32,10 @@
 <style>	
 	.container {
 		width: 100%;
-		background-color: #59a6d5;
+		background-color: #0096ff5c;
 		margin-bottom: 5px;
 		position: relative;
+		border: 0.2px solid #7d7676;
         /* height: 15px; */
 	}
 	span 
@@ -54,9 +55,11 @@
 	.bar {
         text-align: right;
 		padding: 5px 3px 3px 0;
-		font-weight: 300;
+		font-weight: 400;
 		color: white;
-		font-weight: bold;
+		background-color: rgb(65 65 186);
+    border: 0.2px solid #c6b9b9;
+
 		/* transition: .5s ease-out; */
 		font-size:10px;
 		/*  */
