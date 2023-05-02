@@ -394,7 +394,7 @@ let expression=[
 
     //popup.addTo(map);
     
-    map.on('click',function(e)
+ /*    map.on('click',function(e)
     {
       
 
@@ -419,7 +419,7 @@ let expression=[
       update_clicked();
       //showOverlayFunc();
       
-    })
+    }) */
 
  /*    map.on("mouseenter", 'dams_point_layer',function (e) {
 
