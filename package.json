@@ -11,6 +11,7 @@
   "devDependencies": {
     "@originjs/vite-plugin-commonjs": "^1.0.3",
     "@rollup/plugin-dsv": "^3.0.2",
+    "@sveltejs/kit": "^1.0.0-next.589",
     "@sveltejs/vite-plugin-svelte": "^2.0.3",
     "svelte": "^3.55.1",
     "vite": "^4.2.0"
