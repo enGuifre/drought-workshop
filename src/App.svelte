@@ -122,8 +122,8 @@ let prevYearInfo;
   }
   section {
 
-    padding: 10px;
-    margin: 10px;
+    padding: 0px;
+    margin: 0px;
     color: white;
   }
   :root 
@@ -148,8 +148,11 @@ let prevYearInfo;
   {
     border: 1.5px solid white
   }
-  :global(.mapboxgl-popup-anchor-bottom .mapboxgl-popup-tip, .maplibregl-popup-anchor-bottom .maplibregl-popup-tip) {
+  :global(.mapboxgl-popup-anchor-top .mapboxgl-popup-tip, .maplibregl-popup-anchor-top .maplibregl-popup-tip,
+  .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip, .maplibregl-popup-anchor-top-right .maplibregl-popup-tip
+  ) {
     border-top-color: black!important;
+    border-bottom-color: black!important;
   }
 
   :global(.maplibregl-control-container) {
@@ -164,11 +167,18 @@ let prevYearInfo;
   :global(.scale_container line) {
     opacity: 0;
   }
+:global(.map-overlay-close svg)
+{
+  
 
+  stroke:rgb(26, 16, 16)!important;
+  stroke-width: .5;
+
+}
  
   :global(.maplibregl-popup) {
     max-width: unset!important;
-    width: 250px;
+    width: 300px;
   }
   :global(.maplibregl-popup-content) {
     color: white !important;
@@ -185,5 +195,24 @@ let prevYearInfo;
   {
     
     height: 180px;
+  }
+  :global(.close_popup):hover 
+  {
+    cursor: pointer;
+  }
+  :global(.maplibregl-compare)
+  {
+    top:80px!important;
+  }
+  :global(.close_popup)
+  {
+
+    color: white;
+    width: 10px;
+    position: absolute;
+    top: 0px;
+    /* float: right; */
+    right: 10px;
+
   }
 </style>

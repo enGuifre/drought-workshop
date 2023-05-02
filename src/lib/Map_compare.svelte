@@ -1,6 +1,6 @@
 <script>
   import { onMount, onDestroy } from "svelte";
-  
+  import MdClear from 'svelte-icons/md/MdClear.svelte'  
   import { Map, NavigationControl, Popup, LngLat } from "maplibre-gl";
   import * as Compare from "@maplibre/maplibre-gl-compare";
   import "maplibre-gl/dist/maplibre-gl.css";
@@ -284,7 +284,7 @@ function destroyComponent() {
   
   <div id="comparison-container">
     {#if map_compare}
-
+    
     <div class="map-overlay-close" on:click={
     () => {
       
@@ -299,27 +299,45 @@ function destroyComponent() {
           destroyComponent();
 
       }}>
-      <h2>Close</h2>
+      <MdClear />
     </div>
-    <div class="map-overlay">
-      <h2>{selectedSatelliteYear?selectedSatelliteYear:2021}</h2>
-      <h3>{currentInfo.NAME}</h3>
-      <h4>{prevYearInfo.perc_volume} % previous year</h4>
-      <h4>{currentInfo.percent} % this year</h4>
-      <div class="story" style="display: block;">
-        <button class:btn-active={selectedSatelliteYear === "2020"}
-        on:click={() => (selectedSatelliteYear = "2020")}>2020
-      
-      </button>
-    </div> 
-      <div class="story" style="display: block;">
-        <button class:btn-active={selectedSatelliteYear === "2019"}
-        on:click={() => (selectedSatelliteYear = "2019")}>2019
-      
-      </button>
+    <div class="map-overlay center"><div class="title">{currentInfo.NAME}</div>
+      <div class="prevYear">
+        <div class="info"><span class="date">{month}-{selectedSatelliteYear?selectedSatelliteYear:2021}</span><span class="percent"> {prevYearInfo.perc_volume}%</span></div>
+      </div>
+
+      <div class="currentYear">
+        <div class="info"><span class="date">{day}-{month}-{year}</span><span class="percent"> {currentInfo.percent} %</span></div>
         
-      </div>    
+      </div>
     </div>
+   <!--  <div class="map-overlay prevYear">
+      
+      
+      <h4>{prevYearInfo.perc_volume} %</h4>
+      
+        <div class="story" style="display: block;">
+            <button class:btn-active={selectedSatelliteYear === "2020"}
+            on:click={() => (selectedSatelliteYear = "2020")}>2020
+          
+          </button>
+        </div>  
+        <div class="story" style="display: block;">
+          <button class:btn-active={selectedSatelliteYear === "2019"}
+          on:click={() => (selectedSatelliteYear = "2019")}>2019
+        
+           </button>
+          
+        </div>    
+    </div> -->
+   <!--  <div class="map-overlay currentYear">
+      <h2>{day}-{month}-{year}</h2>
+      
+      <h4>{currentInfo.percent} %  </h4>
+      
+         
+    </div> -->
+    
     {/if}
 
     <div id="before" class="map"></div>
@@ -332,6 +350,7 @@ function destroyComponent() {
 <style>
    body {
         overflow: hidden;
+        color:black;
       }
 
       body * {
@@ -348,12 +367,65 @@ function destroyComponent() {
         bottom: 0;
         width: 100%;
       }
-  .map-overlay {
+      .info .date
+      {
+        font-size: .8rem;
+      }
+      .info .percent
+      {
+        font-size: 2rem;
+        color: #0d5589;
+        margin-left: 10px;
+        font-weight: bolder;
+      }
+      .info
+      {
+        width: fit-content;
+    background: #b1a6a6;
+    left: 0;
+    right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 10px;
+      }
+      .title 
+      {
+        font-size: 2rem;
+      }
+      .map-overlay.center{
+        text-transform: uppercase;
+        color:black;
+    position: absolute;
+    z-index: 9999999;
+    /* background: black;
+    border: 1px solid white; */
+    
+
+    padding: 10px;
+    left: 0; 
+  right: 0; 
+  margin-left: auto; 
+  margin-right: auto; 
+  width: 100%; /* Need a specific value to work */
+  }
+  div.prevYear 
+  {
+    float: left;
+    width: 50%;
+    text-align: center;
+  }
+  div.currentYear
+  {
+    float: left;
+    width: 50%;
+    text-align: center;
+  }
+  .map-overlay.prevYear{
     position: absolute;
     z-index: 9999999;
     background: black;
     border: 1px solid white;
-    min-height: 100%;
+    
 
     padding: 10px;
     overflow-y: auto;
@@ -361,22 +433,37 @@ function destroyComponent() {
     border: 1px solid grey;
     font-size: 13px;
   }
-
+  .map-overlay.currentYear{
+      position: absolute;
+      z-index: 9999999;
+      background: black;
+      border: 1px solid white;
+      
+  
+      padding: 10px;
+      overflow-y: auto;
+      width: 180px;
+      border: 1px solid grey;
+      font-size: 13px;
+      right: 15px;
+      top: 2%;
+    }
+    .map-overlay-close:hover 
+    {
+      cursor: pointer;
+    }
   .map-overlay-close {
     position: absolute;
-    z-index: 9999999;
-    background: black;
-    border: 1px solid white;
-    
-
+    z-index: 11119999999;
     padding: 10px;
-    
-    width: 180px;
-    border: 1px solid grey;
+    width: 55px;
+    color: #0dbbcc;
     font-size: 13px;
     right: 15px;
-    top: 6%;
-  }
+    top: 2%;
+}
+
+
 
 
   .map-wrap {

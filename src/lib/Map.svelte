@@ -28,7 +28,7 @@
 
   let map;
   let icgc_sat;
-  
+  let current_code=null;
   
   
   let showOverlay=false;
@@ -42,7 +42,7 @@
 let sensors_arr=[...new Set(sensors.map(d=>String(d.codiACA)))];
 let date = new Date();
 
-let day = date.getDate();
+
 //+1)<10?`0${date.getDate()}`:date.getDate();
 
 /*
@@ -56,7 +56,7 @@ historical.json
       "volume": 31.02
     },
 */
-
+let day = date.getDate();
 let month =date.getMonth()+1;
 //(date.getMonth()+1)<10?`0${date.getMonth()+1}`:date.getMonth()+1;
 
@@ -131,8 +131,8 @@ sensors
 
   $:month_historical_data=selected_info?historical.filter((d,i)=>
   {  
-    if (i==0)
-console.warn(d,selected_info) //25/4/2023
+//     if (i==0)
+// console.warn(d,selected_info) //25/4/2023
     return String(d.codi)==String(selected_info.CODI_ACA) && 
     String(d.dia.split('/')[0]+'/'+d.dia.split('/')[1])==String(day+'/'+month)
    
@@ -425,28 +425,28 @@ let expression=[
 
 alert('entrado')
     }) */
-    function onmousemove_ev(e)
-    {
-      console.log('onmousemove')
-      var features = map.queryRenderedFeatures(e.point, {
-                    layers: ['dams_pol_layer','dams_point_layer']
-                });
+    // function onmousemove_ev(e)
+    // {
+    //   console.log('onmousemove')
+    //   var features = map.queryRenderedFeatures(e.point, {
+    //                 layers: ['dams_pol_layer','dams_point_layer']
+    //             });
       
-      if (features && features.length>0)
-      {
+    //   if (features && features.length>0)
+    //   {
       
-      selected_info=features[0].properties;
+    //   selected_info=features[0].properties;
       
-      console.log(month_historical_data)
+      
    
 
-      }
-      else
-      {
-        selected_info=null;
-      }
-      update_clicked();
-    }
+    //   }
+    //   else
+    //   {
+    //     selected_info=null;
+    //   }
+    //   update_clicked();
+    // }
     map.on("mouseleave", 'dams_point_layer',function (e) {
 
      // if (!clicked_code)
@@ -455,8 +455,10 @@ alert('entrado')
     })
     map.on("mouseenter", 'dams_point_layer',function (e) {
 
+      console.warn('mouseenter circle')
       let selected_info_popup;
       var features = map.queryRenderedFeatures(e.point);
+      
       /*
       , {
                     layers: ['dams_pol_layer','dams_point_layer']
@@ -465,16 +467,21 @@ alert('entrado')
       
       if (features && features.length>0)
       {
-        
+        selected_info=features[0].properties;
         
         //selected_info=features[0].properties;
        
-       
-       selected_info=features[0].properties;
-       
-       console.log(selected_info)
-       console.info(historical_data)
-       selected_info_popup=features[0].properties;
+       if (current_code && selected_info.CODI_ACA==current_code)
+       {
+        return false;
+       }
+       else
+       {
+        selected_info=features[0].properties;
+        current_code=selected_info.CODI_ACA;
+        selected_info_popup=features[0].properties;
+       }
+      
       }
       else
       {
@@ -507,7 +514,10 @@ nivell_absolut: 787.11
 perc_volume: 46.5
 volume: 37.23
 */
-      
+historical_data=historical.filter(d=>
+        String(d.codi)==String(selected_info.CODI_ACA) && d.dia==prevDate
+    )[0]
+console.warn(selected_info,historical_data)
       
       if (historical_data)
       {
@@ -515,7 +525,7 @@ volume: 37.23
       console.log(historical_data,selected_info)
         //even if no votes, we popup the name of municipality
         popup.setHTML(`
-            <div class="title">${selected_info.NAME}</div>
+            <div class="title">${selected_info.NAME}</div><div class="close_popup">x</div>
             <center style='color:gold'>${currentDate}</center>
             <div class='current_perc_bar'></div>
             <div>${selected_info.volume} hm³</div></hr>
@@ -532,13 +542,20 @@ volume: 37.23
         //<div>nivell_absolut: "+historical_data.nivell_absolut+"</div>"
         //<div>perc_volume: "+historical_data.perc_volume+"</div>
 
-        selected_info
+       
       //  var latlng = e.lngLat;
         let coords=features[0].geometry.coordinates;
         let latlng=new LngLat(coords[0], coords[1])
         console.info(latlng)
         popup.addTo(map);
         popup.setLngLat(latlng);
+
+        //how in svelte... create new component... complicated
+        jQuery('.close_popup').click(function()
+        {
+          current_code=null;
+          jQuery(".maplibregl-popup").hide();
+        })
 
         var element = document.createElement("div");
         element.classList.add('current_perc_bar_class');
@@ -585,11 +602,7 @@ volume: 37.23
         var f=document.getElementsByClassName('lineChart_container')[0]
         f.appendChild(element);  
 
-console.log([...month_historical_data,{
-                        perc_volume:selected_info.percent,
-                        dia:currentDate
-                        
-                      }])
+
 
                       myComponent = new MyComponent({ target: element,
                     props: 

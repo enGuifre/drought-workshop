@@ -22,6 +22,7 @@
     "events": "^3.3.0",
     "jquery": "^3.6.4",
     "layercake": "^7.4.0",
-    "maplibre-gl": "^2.4.0"
+    "maplibre-gl": "^2.4.0",
+    "svelte-icons": "^2.1.0"
   }
 }
