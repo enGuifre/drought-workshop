@@ -1,31 +1,12 @@
 export let mapStyle={
   "version": 8,
   "name": "icgc_mapa_base_gris_simplificat",
-  "metadata": {"contextmaps:id": "ece32c2d-f980-4b10-952a-916434b6e47f"},
+  "metadata": {"maputnik:renderer": "mbgljs"},
   "center": [1.537786, 41.837539],
   "zoom": 12,
   "bearing": 0,
   "pitch": 0,
   "sources": {
-    "terrainMapZen": {
-      "type": "raster-dem",
-      "tiles": [
-        "https://s3.amazonaws.com/elevation-tiles-prod/terrarium/{z}/{x}/{y}.png"
-      ],
-      "tileSize": 256,
-      "encoding": "terrarium",
-      "maxzoom": 15
-    },
-    "terrainICGC": {
-      "type": "raster-dem",
-      "tiles": [
-        "https://geoserveis.icgc.cat/servei/catalunya/contextmaps-terreny-5m-rgb/wmts/{z}/{x}/{y}.png"
-      ],
-      "tileSize": 256,
-      "bounds": [0, 40.5, 4.2, 42.86],
-      "minzoom": 7,
-      "maxzoom": 14
-    },
     "openmaptiles": {
       "type": "vector",
       "tiles": [
@@ -56,43 +37,11 @@ export let mapStyle={
       "id": "background",
       "type": "background",
       "minzoom": 0,
-      "maxzoom": 0,
+      "maxzoom": 24,
       "layout": {"visibility": "visible"},
       "paint": {
-        "background-color": "rgba(0,0,0,1)",
-        "background-opacity": {"stops": [[6, 1], [10, 1]]}
-      }
-    },
-    {
-      "id": "terrainMapZen",
-      "type": "hillshade",
-      "source": "terrainMapZen",
-      "minzoom": 0,
-      "maxzoom": 18,
-      "layout": {"visibility": "visible"},
-      "paint": {
-        "hillshade-illumination-anchor": "map",
-        "hillshade-exaggeration": 1,
-        "hillshade-highlight-color": "rgba(0,0,0,1)",
-        "hillshade-shadow-color": "rgba(94, 93, 93, 1)",
-        "hillshade-accent-color": "rgba(250, 250, 250, 1)",
-        "hillshade-illumination-direction": 345
-      }
-    },
-    {
-      "id": "terrainICGC",
-      "type": "hillshade",
-      "source": "terrainICGC",
-      "minzoom": 7,
-      "maxzoom": 18,
-      "layout": {"visibility": "visible"},
-      "paint": {
-        "hillshade-illumination-anchor": "map",
-        "hillshade-exaggeration": 1,
-        "hillshade-highlight-color": "rgba(0,0,0,1)",
-        "hillshade-shadow-color": "rgba(200, 200, 200, 1)",
-        "hillshade-accent-color": "rgba(250, 250, 250, 1)",
-        "hillshade-illumination-direction": 345
+        "background-color": "rgba(200, 200, 200, 1)",
+        "background-opacity": {"stops": [[1, 1], [6, 1]]}
       }
     },
     {
@@ -117,7 +66,7 @@ export let mapStyle={
       "maxzoom": 18,
       "filter": ["all", ["==", "class", "ocean"], ["==", "$type", "Polygon"]],
       "layout": {"visibility": "visible"},
-      "paint": {"fill-opacity": 1, "fill-color": "rgba(174,209,232,1)"}
+      "paint": {"fill-opacity": 1, "fill-color": "rgba(130, 171, 192, 1)"}
     },
     {
       "id": "landcover-glacier",
@@ -180,11 +129,13 @@ export let mapStyle={
       "metadata": {"mapbox:group": "1444849382550.77"},
       "source": "openmaptiles",
       "source-layer": "waterway",
+      "minzoom": 0,
+      "maxzoom": 23,
       "filter": ["==", "class", "river"],
       "layout": {"line-cap": "round", "visibility": "visible"},
       "paint": {
-        "line-color": "rgba(174,209,232,1)",
-        "line-width": {"base": 1.2, "stops": [[10, 0.8], [20, 6]]}
+        "line-color": "rgba(130, 171, 192, 1)",
+        "line-width": {"base": 1.2, "stops": [[10, 0.4], [20, 6]]}
       }
     },
     {
@@ -193,9 +144,9 @@ export let mapStyle={
       "metadata": {"mapbox:group": "1444849382550.77"},
       "source": "openmaptiles",
       "source-layer": "water",
-      "minzoom": 1,
-      "maxzoom": 19,
-      "filter": ["all", ["in", "class", "sea", "river", "lake", "reservoir"]],
+      "minzoom": 0,
+      "maxzoom": 24,
+      "filter": ["match", ["get", "class"], ["lake", "reservoir"], true, false],
       "layout": {"visibility": "visible"},
       "paint": {"fill-color": "rgba(63, 157, 216, 1)"}
     },
@@ -407,20 +358,24 @@ export let mapStyle={
       "type": "line",
       "source": "openmaptiles",
       "source-layer": "boundary",
-      "minzoom": 4,
+      "minzoom": 0,
+      "maxzoom": 10,
       "filter": [
         "all",
         ["in", "admin_level", 4, 5, 6],
         ["==", "$type", "LineString"],
         ["!has", "minzoom"],
-        ["!in", "name", "Comunitat Autònoma de Catalunya"],
-        ["!=", "maritime", 1]
+        ["==", "name", "Comunitat Autònoma de Catalunya"],
+        ["!=", "maritime", 3]
       ],
-      "layout": {"line-join": "round", "visibility": "visible"},
+      "layout": {
+        "line-join": "round",
+        "visibility": "visible",
+        "line-cap": "round"
+      },
       "paint": {
-        "line-color": "rgba(171, 171, 171, 1)",
-        "line-dasharray": [3, 1, 1, 1],
-        "line-width": {"base": 1.4, "stops": [[4, 0.4], [5, 1], [12, 3]]}
+        "line-color": "rgba(255, 255, 255, 1)",
+        "line-width": {"base": 1.4, "stops": [[4, 1], [5, 1], [12, 1]]}
       }
     },
     {
@@ -428,6 +383,7 @@ export let mapStyle={
       "type": "line",
       "source": "openmaptiles",
       "source-layer": "boundary",
+      "minzoom": 0,
       "filter": [
         "all",
         ["==", "$type", "LineString"],
@@ -443,11 +399,8 @@ export let mapStyle={
         "visibility": "visible"
       },
       "paint": {
-        "line-color": "rgba(129,42,66,1)",
-        "line-width": {
-          "base": 1,
-          "stops": [[0, 0.6], [4, 1.4], [5, 2], [12, 8]]
-        }
+        "line-color": "rgba(255, 255, 255, 1)",
+        "line-width": {"base": 1, "stops": [[0, 0.6], [4, 1], [5, 1], [12, 1]]}
       }
     },
     {
@@ -808,8 +761,13 @@ export let mapStyle={
         "visibility": "visible"
       },
       "paint": {
-        "text-color": "rgba(140, 140, 140, 1)",
-        "text-halo-width": 0.9,
+        "text-color": {
+          "stops": [
+            [6, "rgba(255, 255, 255, 1)"],
+            [10, "rgba(255, 255, 255, 1)"]
+          ]
+        },
+        "text-halo-width": 0,
         "text-halo-color": "rgba(255, 255, 255, 0.8)"
       }
     },
@@ -838,8 +796,8 @@ export let mapStyle={
         "visibility": "visible"
       },
       "paint": {
-        "text-color": "rgba(140, 140, 140, 1)",
-        "text-halo-width": 1,
+        "text-color": "rgba(255, 255, 255, 1)",
+        "text-halo-width": 0,
         "text-halo-color": "rgba(255, 255, 255, 0.8)",
         "text-halo-blur": 1,
         "icon-opacity": 1,
@@ -899,12 +857,13 @@ export let mapStyle={
         "visibility": "visible"
       },
       "paint": {
-        "text-color": "rgba(100, 100, 100, 1)",
-        "text-halo-width": 1,
+        "text-color": "rgba(255, 255, 255, 1)",
+        "text-halo-width": 0,
         "text-halo-color": "rgba(255, 255, 255, 0.8)",
         "text-halo-blur": 1,
         "icon-opacity": 1,
-        "text-opacity": 1
+        "text-opacity": 1,
+        "text-translate": [0, 0]
       }
     },
     {
@@ -956,9 +915,9 @@ export let mapStyle={
         "visibility": "visible"
       },
       "paint": {
-        "text-color": "rgba(100, 100, 100, 1)",
-        "text-halo-width": 1,
-        "text-halo-color": "rgba(255, 255, 255, 0.8)",
+        "text-color": "rgba(255, 255, 255, 1)",
+        "text-halo-width": 0.1,
+        "text-halo-color": "rgba(99, 99, 99, 0.8)",
         "text-halo-blur": 1,
         "icon-opacity": 1,
         "text-opacity": 1
@@ -1020,8 +979,8 @@ export let mapStyle={
       },
       "paint": {
         "text-halo-blur": 1,
-        "text-color": "#334",
-        "text-halo-width": 2,
+        "text-color": "rgba(255, 255, 255, 1)",
+        "text-halo-width": 0,
         "text-halo-color": "rgba(255, 255, 255, 0.8)"
       }
     },
@@ -1070,6 +1029,7 @@ export let mapStyle={
       "metadata": {"mapbox:group": "1444849242106.713"},
       "source": "openmaptiles",
       "source-layer": "place",
+      "minzoom": 0,
       "filter": ["all", ["==", "capital", 2], ["==", "class", "city"]],
       "layout": {
         "text-font": ["FiraSans-Regular"],
@@ -2306,5 +2266,5 @@ export let mapStyle={
       }
     }
   ],
-  "id": "3ec83bu1u"
+  "id": "ru07vkz8n"
 }

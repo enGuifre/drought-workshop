@@ -1,15 +1,29 @@
 <script>
   import Map from "./Map.svelte";
   import Map_compare from "./Map_compare.svelte";
+
+  //import map_compare from "./Map.svelte";
   import * as d3 from "d3";
   export let api_data;
+  export let map_compare;
+  
+alert('map_compare is'+map_compare)
 </script>
 
 
 
+{#if map_compare && map_compare===true}
+<Map_compare/> 
+  {:else}
+      {#if api_data}
+      <Map {api_data}/> 
+      {/if}
+  
+{/if}
 
-<Map {api_data}/>
-<!-- <Map_compare/> -->
+
+ 
+<!---->
 
 <style>
   

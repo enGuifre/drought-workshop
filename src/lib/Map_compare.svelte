@@ -1,314 +1,353 @@
-<script context="module"></script>
-
 <script>
   import { onMount, onDestroy } from "svelte";
+  
   import { Map, NavigationControl, Popup, LngLat } from "maplibre-gl";
+  import * as Compare from "@maplibre/maplibre-gl-compare";
   import "maplibre-gl/dist/maplibre-gl.css";
   import * as d3 from "d3";
   import jQuery from "jquery";
+  /* import { createEventDispatcher } from 'svelte'; */
+  //import * as EventEmitter from "events";
+  import EventEmitter from 'events';
+  import { mapStyle } from "../data/mapStyle";
+  import { dams_bbox } from "../data/dams_bbox.js";
 
-  /* import { munis } from "../data/municipis.js"; */
-  import { dams_centroid } from "../data/dams_centroid.js";
-  import { dams_polygon } from "../data/dams_polygon.js";
-
-  let map;
-
-  export let selectedDam;
+  /* import Compare from './compare.js'; */
+  /* let helper = new Helper(); */
+   //$:satellite=null;
+   let beforeMap;
+   let icgc_sat_prev;
+   let selectedSatelliteYear;
+   let date = new Date();
+export let map_compare;
+export let currentInfo;
+export let prevYearInfo;
+let coords;
+let afterMap;
+if (currentInfo)
+{
+  console.info(currentInfo)
+  console.info(dams_bbox.features)
   
-  
-  let showOverlay=false;
-  let clicked_code=null;
-
-  function showOverlayFunc(){
-    showOverlay=true;
-  }
-  function generateRandom(maxLimit = 100){
-  let rand = Math.random() * maxLimit;
-  console.log(rand); // say 99.81321410836433
-
-  rand = Math.floor(rand); // 99
-
-  return rand;
-}
-
-  dams_centroid.features.forEach((d) => {
-    d.properties["percent"] =generateRandom();
-  });
-
-  let min_max = d3.extent(dams_centroid.features, (d) => d.properties.percent);
-  $:selected_info=null;
- 
-  let selected_data=selected_info?selected_info:null;
-  
-  function update_clicked()
-  {
-    console.log(selected_info)
-    clicked_code=selected_info.CODI_ACA;
-  }
-  onMount(() => {
-    const data = [];
-    
-    map = new Map({
-      container: "map", // container id
-      //style: 'mapbox://styles/mapbox/streets-v8',
-      style: {
-        version: 8,
-        sources: {
-          geoserver: {
-            type: "vector",
-            tiles: [
-              "https://geospatial.jrc.ec.europa.eu/geoserver/gwc/service/wmts?REQUEST=GetTile&SERVICE=WMTS&VERSION=1.0.0&LAYER=hotspots:gaul_0_simplified&STYLE=&TILEMATRIX=EPSG:900913:{z}&TILEMATRIXSET=EPSG:900913&FORMAT=application/vnd.mapbox-vector-tile&TILECOL={x}&TILEROW={y}",
-            ],
-          },
-        },
-        layers: [
-          {
-            id: "gaul_0_simple",
-            source: "geoserver",
-            "source-layer": "gaul_0_simplified",
-            type: "fill",
-            // "minzoom": 4,
-            // "maxzoom": 6,
-            paint: {
-              "fill-color": "#212324",
-              "fill-outline-color": "#87989c",
-              "fill-opacity": 1,
-            },
-          },
-        ],
-      },
-       center:[1.05, 41.4],
-       //center:[2.423955,41.960341],
-
-      //center: [141.15448379999998, 39.702053　],
-      zoom: 5,
-      //maxBounds:[[-0.665553,40.45029], [2.276123,42.462188]],
-      maxBounds: [
-        [-0.37, 40.3],
-        [3.6, 42.8],
-      ],
-
-      attributionControl: false,
-    });
-    
-
-    map.on("load", function () {
-      map.addControl(new NavigationControl(), "top-right");
-
-      map.addSource("maptiler_winter_source", {
-        "type": "raster",
-        "tiles": ["https://api.maptiler.com/maps/winter/{z}/{x}/{y}.png?key=PfeqCqeOXLcGceolGsUb"],
-
-        //"tiles":["https://api.maptiler.com/maps/pastel/{z}/{x}/{y}.png?key=PfeqCqeOXLcGceolGsUb"],
-
-        'tileSize': 512
-    });
-
-    let maptiler_winter = {
-        active: false,
-        'id': 'maptiler_winter',
-        'type': 'raster',
-        'source': 'maptiler_winter_source',
-
-    }
-
-    /*   map.addSource("black_cartodb", {
-        "type": "raster",
-        "tiles": ["https://basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png"],
-        //"tiles":["https://api.maptiler.com/maps/pastel/{z}/{x}/{y}.png?key=PfeqCqeOXLcGceolGsUb"],
-
-        'tileSize': 512
-    });
-
-    let black_cartodb = {
-        active: true,
-        'id': 'black_cartodb',
-        'type': 'raster',
-        'source': 'black_cartodb',
-        'layout': {
-            // Make the layer visible by default.
-            'visibility': 'visible'
-        },
-
-    } */
-    map.addLayer(maptiler_winter)
-
-      //it has to go after load!
-      map.addSource('dams_pol_source', {
-                    'type': 'geojson',
-                    'data': dams_polygon
-                    });
-
-    let dams_pol_layer=  {
-       'id': 'dams_pol_layer',
-        'type': 'fill',
-        'source': 'dams_pol_source',
-        'paint': {
-          'fill-color':'#1884ba',
-          "fill-outline-color": "#c4cacc",
-
-        }
-      }
-
-      dams_pol_layer.layout = {
-        'visibility': 'visible'
-      };
-      map.addLayer(dams_pol_layer);
-
-      map.addSource('dams_point_source', {
-                    'type': 'geojson',
-                    'data': dams_centroid
-                    });
-
-    let dams_point_layer=  {
-       'id': 'dams_point_layer',
-        'type': 'circle',
-        'source': 'dams_point_source',
-        'paint': {
-           "circle-radius": [
-            "interpolate", ["linear"],
-            ["get", "percent"],
-            min_max[0],
-            (2/map.getZoom()),
-            min_max[1],
-            (5/map.getZoom())*20,
-        ],
-          'circle-color':'#1E90FF',
-          "circle-stroke-width": 2,
-        "circle-stroke-color": "#c49435",
-        "circle-opacity": 0.4,
-
-        }
-      }
-      map.addLayer(dams_point_layer);
-
+   let bbox_pol=dams_bbox.features.filter(d=>String(d.properties.CODI_ACA)==String(currentInfo.CODI_ACA))[0];
    
-    });
-
-    map.on("viewreset", function () {
+   coords=bbox_pol.geometry.coordinates[0][0];
   
-     
-    });
-    map.on("movestart", function () {
-     
-    });
-    map.on("rotate", function () {
  
-    });
-    map.on("moveend", function () {
-      
+}
+let day = date.getDate();
+let month = (date.getMonth()+1)<10?`0${date.getMonth()+1}`:date.getMonth()+1;
+
+let year = date.getFullYear();
+    let currentDate = `${day}/${month}/${year}`;
+    let prevDate=`${day}/${month}/${year-1}`;
+
+   $:{
+      if (selectedSatelliteYear) {
+        //alert(selectedSatelliteYear)
+          console.log(`https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&WIDTH=126&HEIGHT=126&BBOX={bbox-epsg-3857}&TIME=${selectedSatelliteYear}-${month}&dt=${Date.now()}`)
+              // Set the tile url to a cache-busting url (to circumvent browser caching behaviour):
+              beforeMap.getSource('icgc_sat_source_prev').tiles = [ `https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&WIDTH=126&HEIGHT=126&BBOX={bbox-epsg-3857}&TIME=${selectedSatelliteYear}-${month}`]
+              //&dt=${Date.now()}`]
+
+          // Remove the tiles for a particular source
+          beforeMap.style.sourceCaches['icgc_sat_source_prev'].clearTiles()
+
+          // Load the new tiles for the current viewport (map.transform -> viewport)
+          beforeMap.style.sourceCaches['icgc_sat_source_prev'].update(beforeMap.transform)
+
+          // Force a repaint, so that the map will be repainted without you having to touch the map
+          beforeMap.triggerRepaint()
+            
+              /* beforeMap.removeLayer('icgc_sat_prev');
+              beforeMap.addLayer(icgc_sat_prev); */
+      }
+
+   }
+
+   let onMount_actions=function()
+   {
+    beforeMap = new Map({
+        container: "before",
+        style:
+         mapStyle,
+          center:[1.05, 41.4],
+        zoom: 7,
+      });
+
+      afterMap = new Map({
+        container: "after",
+        style:
+        mapStyle,
+          center:[1.05, 41.4],
+        zoom: 7
+      });
+      beforeMap.on("load", function () {
+
+        //sau 
+        // 2.337, "xmax": 2.415, "y_min": 41.963, "y_max": 42
+
     
-    });
 
-    let popup = new Popup({
-      closeButton: false,
-      closeOnClick: true,
-      
-      offset: {
-        bottom: [0, -20],
-        top: [0, 15],
-        "top-left": [0, 0], //[linearOffset, (markerHeight - markerRadius - linearOffset) * -1],
-        "top-right": [0, 0], //[-linearOffset, (markerHeight - markerRadius - linearOffset) * -1],
-      },
-    });
+      beforeMap.fitBounds([
+     coords[1], // southwestern corner of the bounds
+     coords[0] // northeastern corner of the bounds
+     ]);
+ 
 
-    map.on('click',function(e)
-    {
+      afterMap.addSource('icgc_sat_source_now', {
+    
+    'type': 'raster',
+    'tiles': [
       
+      'https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=126&HEIGHT=126&TIME=2023-03'
+    ],
+    'tileSize': 126,
+  
+    })
+      beforeMap.addSource('icgc_sat_source_prev', {
+    
+    'type': 'raster',
+    'tiles': [
       
-      var features = map.queryRenderedFeatures(e.point, {
-                    layers: ['dams_pol_layer','dams_point_layer']
-                });
-      console.log(features)
-      if (features && features.length>0)
-      {
-      selected_info=features[0].properties;
-      }
-      else
-      {
-        selected_info=null;
-      }
-      update_clicked();
-      //showOverlayFunc();
-      
+      'https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=126&HEIGHT=126&TIME=2022-02'
+    ],
+    'tileSize': 126,
+  
     })
 
+    icgc_sat_prev={
 
-    map.on("mousemove", function (e) {
+'id': 'icgc_sat_prev',
 
-      let selected_info_popup;
-      var features = map.queryRenderedFeatures(e.point, {
-                    layers: ['dams_pol_layer','dams_point_layer']
-                });
-      console.log(features)
-      if (features && features.length>0)
+'type': 'raster',
+'source': 'icgc_sat_source_prev',
+'layout':
+{
+visibility: 'none'
+},
+'paint': {
+
+}
+}
+
+    beforeMap.addLayer(icgc_sat_prev);
+
+    
+    beforeMap.on("render", function() {
+
+      if (beforeMap.isStyleLoaded())
       {
-        //selected_info=features[0].properties;
-       selected_info_popup=features[0].properties;
+        console.log('READY?????')
       }
       else
       {
-     
-        jQuery(".maplibregl-popup").hide();
-        popup.remove();
+        console.log('READY-----')
+      }
+  //if(!beforeMap.loaded()) {
+ /*    if (beforeMap.isSourceLoaded('icgc_sat_prev'))
+    {
+      console.log('isSourceLoaded')
+    } */
+    //beforeMap.featuresIn(...);
     
-        return false;
-      }
-
-      if (features[0].layer.type=='fill')
-      {
-        
-        selected_info_popup=dams_centroid.features.filter(d=>d.properties.CODI_ACA==selected_info_popup.CODI_ACA)[0].properties;
-        
-      }
-      console.info(selected_info_popup,clicked_code)
-     
-      jQuery(".maplibregl-popup").show();
-        //even if no votes, we popup the name of municipality
-        popup.setHTML(
-          "<h3>" + selected_info_popup.NAME + "</h3><h2>" + selected_info_popup.percent + "%</h2><span>Click to see more</span>"
-        );
-        var latlng = e.lngLat;
-        popup.addTo(map);
-        popup.setLngLat(latlng);
-        
-       
-      
-     
-    });
   
-  });
+});
+
+  /*   let i=0;
+    beforeMap.on('sourcedata', (e)=> {
+      
+      i++;      
+      if (i==50)
+    //if (beforeMap.loaded()) 
+    {
+     console.log('all tiles are loaded ???')
+
+
+     // turn off sourcedata listener if its no longer needed
+     beforeMap.off('sourcedata');
+     
+    }
+}); */
+    
+    
+
+    afterMap.addLayer({
+
+      'id': 'icgc_sat',
+      
+    'type': 'raster',
+    'source': 'icgc_sat_source_now',
+    'paint': {}
+    });
+    afterMap.fitBounds([
+     coords[1], // southwestern corner of the bounds
+     coords[0] // northeastern corner of the bounds
+     ]);
+      // A selector or reference to HTML element
+      var container = "#comparison-container";
+
+      var compare = new Compare(beforeMap, afterMap, container, {
+       // mousemove: true, // Optional. Set to true to enable swiping during cursor movement.
+        orientation: 'vertical' // Optional. Sets the orientation of swiper to horizontal or vertical, defaults to vertical
+        // Set this to enable comparing two maps by mouse movement:
+        // m ousemove: true
+      });
+      beforeMap.setLayoutProperty('icgc_sat_prev','visibility', 'visible');
+      
+      //satellite=true;
+   /*    setTimeout(function()
+      {
+        console.warn('remove')
+        compare.remove();
+        //back to previous state, looks like only afterMap stays
+        afterMap.setLayoutProperty('icgc_sat','visibility', 'none');
+      },6000); */
+
+    
+    })
+   }
+  onMount(() => {
+    console.warn('mount')
+    if (map_compare && map_compare==true)
+    onMount_actions()
+    else 
+    alert('do nothing')
+    /*
+    var beforeMap = new Map({
+        container: "before",
+        style:
+          "https://api.maptiler.com/maps/hybrid/style.json?key=YymZPIGfniu7apIvln6X",
+        center: [7.221275, 50.326111],
+        zoom: 15,
+      });
+
+      var afterMap = new Map({
+        container: "after",
+        style:
+          "https://api.maptiler.com/maps/streets/style.json?key=YymZPIGfniu7apIvln6X",
+        center: [7.221275, 50.326111],
+        zoom: 15,
+      });
+      */
+
+    
+
+  
+      
+  
+
+
+      // Get Current position - this will return the slider's current position, in pixels
+// compare.currentPosition;
+
+// // Set Position - this will set the slider at the specified (x) number of pixels from the left-edge or top-edge of viewport based on swiper orientation
+// compare.setSlider(x);
+
+// //Listen to slider movement - and return current position on each slideend
+// compare.on('slideend', (e) =&gt; {
+//   console.log(e.currentPosition);
+// });
+
+// //Remove - this will remove the compare control from the DOM and stop synchronizing the two maps.
+// compare.remove();
+  })
+  let showComponent = true;
+
+function destroyComponent() {
+  showComponent = false;
+}
 
   onDestroy(() => {
-    map.remove();
+    beforeMap.remove();
+    afterMap.remove();
+    if (showComponent === false) {
+      console.log('MyComponent has been destroyed');
+    }
   });
-
-  //selectedDam && 
 </script>
 
-<div class="map-wrap">
-  {#if selected_info && (clicked_code && clicked_code==selected_info.CODI_ACA)}
-    <div class="map-overlay">
-      <div class="story" style="display: block;">
-        <h3>{selected_info.NAME}</h3>
-        <ul>
-          <li>Codi {selected_info.CODI_ACA}</li>
-        </ul>
-       
+<svelte:head>
+<!--
+<script src="https://unpkg.com/maplibre-gl@2.1.6/dist/maplibre-gl.js"></script>
+<link href="https://unpkg.com/maplibre-gl@2.1.6/dist/maplibre-gl.css" rel="stylesheet"> 
+<script src="https://rawcdn.githack.com/astridx/astridx.github.io/a9d7297a4fe1e3a4d7ebeb1e4e662fd1339ef3b5/maplibreexamples/plugins/maplibre-gl-compare.js"></script>
+-->
+
+<!--   on:click={satellite_date(2011)}>2011 -->
+  <link rel="stylesheet" href="https://rawcdn.githack.com/astridx/astridx.github.io/a9d7297a4fe1e3a4d7ebeb1e4e662fd1339ef3b5/maplibreexamples/plugins/maplibre-gl-compare.css" type="text/css" />
+
+
+</svelte:head>
+<!-- {#if showComponent} -->
+<div class="map-wrap-compare">
+  
+  <div id="comparison-container">
+    {#if map_compare}
+
+    <div class="map-overlay-close" on:click={
+    () => {
+      
+      
+       const event = new CustomEvent('closeSatelliteEvent', {
+            detail: {
+              map_compare: false
+            }
+          });
+
+          dispatchEvent(event);
+          destroyComponent();
+
+      }}>
+      <h2>Close</h2>
     </div>
+    <div class="map-overlay">
+      <h2>{selectedSatelliteYear?selectedSatelliteYear:2021}</h2>
+      <h3>{currentInfo.NAME}</h3>
+      <h4>{prevYearInfo.perc_volume} % previous year</h4>
+      <h4>{currentInfo.percent} % this year</h4>
+      <div class="story" style="display: block;">
+        <button class:btn-active={selectedSatelliteYear === "2020"}
+        on:click={() => (selectedSatelliteYear = "2020")}>2020
+      
+      </button>
+    </div> 
+      <div class="story" style="display: block;">
+        <button class:btn-active={selectedSatelliteYear === "2019"}
+        on:click={() => (selectedSatelliteYear = "2019")}>2019
+      
+      </button>
+        
+      </div>    
+    </div>
+    {/if}
+
+    <div id="before" class="map"></div>
+    <div  id="after" class="map"></div>
   </div>
-  {/if}
-  <div class="map" id="map" />
+  <!-- <div class="map" id="map" /> -->
 </div>
+<!-- {/if} -->
 
 <style>
-  .yearbtn {
-    padding: 5px;
-  }
-  .btn-active {
-    background: #888;
-  }
+   body {
+        overflow: hidden;
+      }
 
+      body * {
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+      }
+
+      .map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+      }
   .map-overlay {
     position: absolute;
     z-index: 9999999;
@@ -323,38 +362,42 @@
     font-size: 13px;
   }
 
-  .story ul {
-    list-style-type: none;
-    padding: 5px;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    row-gap: 10px;
+  .map-overlay-close {
+    position: absolute;
+    z-index: 9999999;
+    background: black;
+    border: 1px solid white;
+    
+
+    padding: 10px;
+    
+    width: 180px;
+    border: 1px solid grey;
+    font-size: 13px;
+    right: 15px;
+    top: 6%;
   }
 
-  .story ul li {
-    display: contents;
-  }
-  .story .voted-proportion {
-    text-align: right;
-  }
-  .story .party-name {
-    text-align: left;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    overflow: hidden;
-  }
 
   .map-wrap {
-    position: absolute!important;
+    /* position: absolute!important; */
     
   }
-
-  .map {
-    position: absolute !important;
-    width: 100% !important;
-    height: 100% !important;
-    background:#282856;
-  }
+  .maplibregl-compare .compare-swiper-vertical {
+    background-color: #3887be;
+    box-shadow: inset 0 0 0 2px #fff;
+    display: inline-block;
+    border-radius: 50%;
+    position: absolute;
+    width: 60px;
+    height: 60px;
+    top: 50%;
+    left: -30px;
+    margin: -30px 1px 0;
+    color: #fff;
+    cursor: ew-resize;
+    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0iVVRGLTgiIHN0YW5kYWxvbmU9Im5vIj8+PHN2ZyAgIHhtbG5zOmRjPSJodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyIgICB4bWxuczpjYz0iaHR0cDovL2NyZWF0aXZlY29tbW9ucy5vcmcvbnMjIiAgIHhtbG5zOnJkZj0iaHR0cDovL3d3dy53My5vcmcvMTk5OS8wMi8yMi1yZGYtc3ludGF4LW5zIyIgICB4bWxuczpzdmc9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIiAgIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgICB4bWxuczpzb2RpcG9kaT0iaHR0cDovL3NvZGlwb2RpLnNvdXJjZWZvcmdlLm5ldC9EVEQvc29kaXBvZGktMC5kdGQiICAgeG1sbnM6aW5rc2NhcGU9Imh0dHA6Ly93d3cuaW5rc2NhcGUub3JnL25hbWVzcGFjZXMvaW5rc2NhcGUiICAgd2lkdGg9IjYwIiAgIGhlaWdodD0iNjAiICAgdmVyc2lvbj0iMS4xIiAgIHZpZXdCb3g9IjAgMCA2MCA2MCIgICBpZD0ic3ZnNTQzNCIgICBpbmtzY2FwZTp2ZXJzaW9uPSIwLjkxK2RldmVsK29zeG1lbnUgcjEyOTExIiAgIHNvZGlwb2RpOmRvY25hbWU9Imwtci5zdmciPiAgPG1ldGFkYXRhICAgICBpZD0ibWV0YWRhdGE1NDQ0Ij4gICAgPHJkZjpSREY+ICAgICAgPGNjOldvcmsgICAgICAgICByZGY6YWJvdXQ9IiI+ICAgICAgICA8ZGM6Zm9ybWF0PmltYWdlL3N2Zyt4bWw8L2RjOmZvcm1hdD4gICAgICAgIDxkYzp0eXBlICAgICAgICAgICByZGY6cmVzb3VyY2U9Imh0dHA6Ly9wdXJsLm9yZy9kYy9kY21pdHlwZS9TdGlsbEltYWdlIiAvPiAgICAgICAgPGRjOnRpdGxlPjwvZGM6dGl0bGU+ICAgICAgPC9jYzpXb3JrPiAgICA8L3JkZjpSREY+ICA8L21ldGFkYXRhPiAgPGRlZnMgICAgIGlkPSJkZWZzNTQ0MiIgLz4gIDxzb2RpcG9kaTpuYW1lZHZpZXcgICAgIHBhZ2Vjb2xvcj0iI2ZmZmZmZiIgICAgIGJvcmRlcmNvbG9yPSIjNjY2NjY2IiAgICAgYm9yZGVyb3BhY2l0eT0iMSIgICAgIG9iamVjdHRvbGVyYW5jZT0iMTAiICAgICBncmlkdG9sZXJhbmNlPSIxMCIgICAgIGd1aWRldG9sZXJhbmNlPSIxMCIgICAgIGlua3NjYXBlOnBhZ2VvcGFjaXR5PSIwIiAgICAgaW5rc2NhcGU6cGFnZXNoYWRvdz0iMiIgICAgIGlua3NjYXBlOndpbmRvdy13aWR0aD0iMTI4NiIgICAgIGlua3NjYXBlOndpbmRvdy1oZWlnaHQ9Ijc1MSIgICAgIGlkPSJuYW1lZHZpZXc1NDQwIiAgICAgc2hvd2dyaWQ9InRydWUiICAgICBpbmtzY2FwZTp6b29tPSI0IiAgICAgaW5rc2NhcGU6Y3g9IjI1Ljg4OTgzMSIgICAgIGlua3NjYXBlOmN5PSIzNC4zODE4MzMiICAgICBpbmtzY2FwZTp3aW5kb3cteD0iMCIgICAgIGlua3NjYXBlOndpbmRvdy15PSIyMyIgICAgIGlua3NjYXBlOndpbmRvdy1tYXhpbWl6ZWQ9IjAiICAgICBpbmtzY2FwZTpjdXJyZW50LWxheWVyPSJzdmc1NDM0IiAgICAgaW5rc2NhcGU6b2JqZWN0LW5vZGVzPSJ0cnVlIiAgICAgaW5rc2NhcGU6c25hcC1zbW9vdGgtbm9kZXM9InRydWUiPiAgICA8aW5rc2NhcGU6Z3JpZCAgICAgICB0eXBlPSJ4eWdyaWQiICAgICAgIGlkPSJncmlkNTk4OSIgLz4gIDwvc29kaXBvZGk6bmFtZWR2aWV3PiAgPHBhdGggICAgIHN0eWxlPSJmaWxsOiNmZmZmZmY7ZmlsbC1ydWxlOmV2ZW5vZGQ7c3Ryb2tlOm5vbmU7c3Ryb2tlLXdpZHRoOjFweDtzdHJva2UtbGluZWNhcDpidXR0O3N0cm9rZS1saW5lam9pbjptaXRlcjtzdHJva2Utb3BhY2l0eToxIiAgICAgZD0iTSAyNSAyNCBMIDE2IDMwIEwgMjUgMzYgTCAyNSAyNCB6IE0gMzUgMjQgTCAzNSAzNiBMIDQ0IDMwIEwgMzUgMjQgeiAiICAgICBpZD0icGF0aDU5OTUiIC8+PC9zdmc+);
+}
 
   /* .watermark {
     position: absolute;
