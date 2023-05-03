@@ -132,7 +132,9 @@ not_aca_centroids.map((d) => {
 let not_aca_min_max_percent = d3.extent(not_aca_centroids, (d) => d.properties.perc_volume);
 let not_aca_min_max_volume = d3.extent(not_aca_centroids, (d) => d.properties.volume);
 let not_aca_min_max_capacity = d3.extent(not_aca_centroids, (d) => d.properties.capacity);
-console.warn(not_aca_min_max_capacity);
+
+
+
 
 visible_centroids.map((d) => {
   let sensor = sensors.filter((s) => s.codiACA == d.properties.CODI_ACA);
@@ -161,6 +163,8 @@ let min_max_percent = d3.extent(visible_centroids, (d) => d.properties.percent);
 let min_max_volume = d3.extent(visible_centroids, (d) => d.properties.volume);
 let min_max_capacity = d3.extent(visible_centroids, (d) => d.properties.capacity);
 
+let all_min_max_capacity=d3.extent([...not_aca_min_max_capacity,...min_max_capacity])
+console.warn(all_min_max_capacity);
 let selected_info;
 $: selected_info = selected_info ? selected_info : null;
 let historical_data = null;
@@ -358,9 +362,9 @@ function satellite() {
                       "interpolate", ["linear"],
                       ["get", "capacity"],
 
-                      not_aca_min_max_capacity[0],
+                      all_min_max_capacity[0],
                       (2 / map.getZoom() * 20),
-                      not_aca_min_max_capacity[1],
+                      all_min_max_capacity[1],
                       (2 / map.getZoom()) * 45,
                   ],
               }
@@ -384,9 +388,9 @@ function satellite() {
                       "interpolate", ["linear"],
                       ["get", "capacity"],
 
-                      min_max_capacity[0],
+                      all_min_max_capacity[0],
                       (2 / map.getZoom() * 20),
-                      min_max_capacity[1],
+                      all_min_max_capacity[1],
                       (2 / map.getZoom()) * 45,
                   ],
                   "circle-color": expression,
@@ -486,15 +490,17 @@ function satellite() {
                     */
                   popup.setHTML(`
               <div class="title">${data.currentData.name}</div><div class="close_popup">x</div>
-               <div>Max capacity ${info.capacity} hm³</div> 
-              <center style='color:gold'>${data.currentData.Dia}</center>
+               <div>Max capacity <span style="color:#00bcff">${info.capacity} hm³</span></div> 
+              <div style='color:gold'>${data.currentData.Dia}</div>
               <div class='non_aca_current_perc_bar'></div>
-              <div>${data.currentData.vol_hm3} hm³ ${+data.currentData.perc_volume}%</div></hr>
-              <center style='color:gold'>${data.prevData.Dia}</center>
+
+              <div>${data.currentData.vol_hm3} hm³</div></hr>
+              <div class="prevDate">${data.prevData.Dia}</div>
               <div class='prev_perc_bar'>
                 <div class='nonaca_prev_perc_bar_class'></div>
               </div>
-              <div>volumes: ${data.prevData.data.vol_hm3} hm³ ${+data.prevData.perc_volume}%</div>
+              <div>${data.prevData.vol_hm3} hm³</div></hr>
+              
               <div class='see_satellite_container'></div>
               
 
@@ -682,15 +688,16 @@ function satellite() {
               //even if no votes, we popup the name of municipality
               popup.setHTML(`
               <div class="title">${selected_info.NAME}</div><div class="close_popup">x</div>
-              <div>Max capacity ${selected_info.capacity} hm³</div>
-              <center style='color:gold'>${currentDate}</center>
+              <div>Max capacity <span style="color:#00bcff">${selected_info.capacity}</span> hm³</div>
+              <div style='color:gold'>${currentDate}</div>
               <div class='current_perc_bar'></div>
               </hr>
-              <center style='color:gold'>${historical_data.dia}</center>
+              <div>${selected_info.volume} hm³</div>
+              <div class="prevDate">${historical_data.dia}</div>
               <div class='prev_perc_bar'>
                 <div class='prev_perc_bar_class'></div>
                   </div>
-              <div>volume: ${historical_data.volume} hm³</div>
+              <div>${historical_data.volume} hm³</div>
               <div class='see_satellite_container'></div>
               <div class='lineChart_container'></div>
 
@@ -916,10 +923,6 @@ function satellite() {
   width: 100px;
   height: 100px;
 }
-.maplibregl-popup .title 
-{
-  font-size: 1rem;
-  text-align: center;
-}
+
 
 </style>

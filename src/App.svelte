@@ -80,6 +80,22 @@ let prevYearInfo;
 
 
 <style>
+  :global(.maplibregl-popup .prevDate)
+  {
+    
+    color: gold;
+    padding-top: 10px;
+    margin-top: 10px;
+    border-top: 1px solid gray;
+    /* margin-bottom: 7px; */
+
+  }
+  :global(.maplibregl-popup .title)
+{
+  font-size: 1.3rem;
+  text-align: center;
+  margin-bottom: 5px;
+}
   #app 
   {
     background-color: red;
