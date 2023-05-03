@@ -573,10 +573,11 @@ if (features && features.length>0)
             </div>
             <div>volumes: ${data.prevData.data.vol_hm3} hm³ ${+data.prevData.perc_volume}%</div>
             <div class='see_satellite_container'></div>
-            <div class='lineChart_container'></div>
+            
 
             
           `);
+          ///* <div class='lineChart_container'></div> */
           jQuery(".maplibregl-popup").show();
       
         let coords=features[0].geometry.coordinates;
