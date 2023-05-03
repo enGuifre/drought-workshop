@@ -93,7 +93,7 @@ let filtered_reservoirs_not_aca_data=reservoirs_not_aca_data.filter(d=>
     d.perc_volume=Number(d.perc_volume.replace(',','.'))
     return d;
 }); 
-
+console.info(filtered_reservoirs_not_aca_data.filter(d=>d.Codi_ACA==='E0750'))
 
 let date = new Date();
 
@@ -177,7 +177,8 @@ sensors
     },
 */
 
-/*$:historical_data=
+/*
+$:historical_data=
   {
     
    if (selected_info)
@@ -563,9 +564,9 @@ if (features && features.length>0)
       })
 
       let data={};
-      data.currentData=searchRecord(f,'03/05/2023');
+      data.currentData=searchRecord(filtered_reservoirs_not_aca_data,'03/05/2023');
 
-      data.prevData=searchRecord(f,'03/05/2022');
+      data.prevData=searchRecord(filtered_reservoirs_not_aca_data,'03/05/2022');
 
       console.log(data)
         
@@ -778,16 +779,16 @@ volume: 37.23
             <center style='color:gold'>${currentDate}</center>
             <div class='current_perc_bar'></div>
             <div>${selected_info.volume} hm³</div></hr>
-            <center style='color:gold'>${prevDate}</center>
+            <center style='color:gold'>${prevDate}</center>`+historical_data?`
             <div class='prev_perc_bar'>
               <div class='prev_perc_bar_class'></div>
                 </div>
-            <div>volume: ${historical_data[0].volume} hm³</div>
+            <div>volume: ${historical_data.volume} hm³</div>
             <div class='see_satellite_container'></div>
             <div class='lineChart_container'></div>
 
             
-          `);
+          `:`No information`);
         //<div>nivell_absolut: "+historical_data.nivell_absolut+"</div>"
         //<div>perc_volume: "+historical_data.perc_volume+"</div>
 
@@ -806,6 +807,9 @@ volume: 37.23
           jQuery(".maplibregl-popup").hide();
         })
 
+        console.warn(historical_data)
+        if (historical_data.length>0)
+        {
         var element = document.createElement("div");
         element.classList.add('current_perc_bar_class');
         var f=document.getElementsByClassName('current_perc_bar')[0]
@@ -837,6 +841,7 @@ volume: 37.23
         var f=document.getElementsByClassName('prev_perc_bar')[0]
         f.appendChild(element);  */ 
 
+       
         element=document.getElementsByClassName('prev_perc_bar_class')[0]
 
         myComponent = new MyComponent({ target: element,
@@ -866,6 +871,7 @@ volume: 37.23
                                 }  
                     }
                   });  
+        
 
         var element = document.createElement("div");
         element.classList.add('see_satellite');
@@ -886,6 +892,7 @@ volume: 37.23
 
                       
             } }); 
+          }
         
         /*  
         

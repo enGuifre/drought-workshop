@@ -88,8 +88,10 @@
     stroke-dasharray: 2;
   }
 
+ 
   .tick text {
-     fill: #f7f6f6;;
+    fill: #e3e3e9;
+    font-weight: bold;
   }
 
   .tick.tick-0 line {

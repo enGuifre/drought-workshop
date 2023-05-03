@@ -96,6 +96,7 @@
 
   .tick text {
     fill: #e3e3e9;
+    font-weight: bold;
   }
 
   .tick .tick-mark,
