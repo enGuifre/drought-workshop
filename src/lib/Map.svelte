@@ -88,8 +88,8 @@
           else return String(d2);
         })
         .join("/");
-      if (isNaN(d.perc_volume)) d.perc_volume = Number(d.perc_volume.replace(",", "."));
-      if (isNaN(d.vol_hm3)) d.vol_hm3 = Number(d.vol_hm3.replace(',','.'))
+      isNaN(d.perc_volume)?d.perc_volume = Number(d.perc_volume.replace(",", ".")):d.perc_volume;
+      isNaN(d.vol_hm3)? d.vol_hm3 = Number(d.vol_hm3.replace(',','.')):d.vol_hm3;
     
 
     return d;
@@ -110,17 +110,29 @@ not_aca_centroids.map((d) => {
     return d2.Codi_ACA == d.properties.CODI_ACA;
   })[0];
   if (data) {
+    console.warn(data.cap_hm3,isNaN(data.cap_hm3))
     d.properties.volume = data.vol_hm3;
+    //d.properties.capacity = data.cap_hm3/1000;
+    if (isNaN(data.cap_hm3))
+    {
+      d.properties.capacity = Number(data.cap_hm3.replace(',','.'))/1000;
+    }
+    else
+    {
+      d.properties.capacity = Number(data.cap_hm3)/1000;
+    }
     d.properties.perc_volume = data.perc_volume;
   } else {
     d.properties.volume = 0;
+    d.properties.capacity = 0;
     d.properties.perc_volume = 0;
   }
 });
-console.warn(not_aca_centroids);
 
 let not_aca_min_max_percent = d3.extent(not_aca_centroids, (d) => d.properties.perc_volume);
 let not_aca_min_max_volume = d3.extent(not_aca_centroids, (d) => d.properties.volume);
+let not_aca_min_max_capacity = d3.extent(not_aca_centroids, (d) => d.properties.capacity);
+console.warn(not_aca_min_max_capacity);
 
 visible_centroids.map((d) => {
   let sensor = sensors.filter((s) => s.codiACA == d.properties.CODI_ACA);
@@ -137,6 +149,8 @@ visible_centroids.map((d) => {
     if (element.description.includes('Percentatge')) {
       d.properties.percent = +sensor_data.observations[0].value;
     } else {
+      d.properties.capacity=Number(element["componentAdditionalInfo__Capacitat màxima embassament"].split(' hm³')[0].replace(',','.'))
+      //: "5,32 hm³",
       d.properties.volume = +sensor_data.observations[0].value;
     }
     element.observations = sensor_data.observations;
@@ -145,6 +159,7 @@ visible_centroids.map((d) => {
 
 let min_max_percent = d3.extent(visible_centroids, (d) => d.properties.percent);
 let min_max_volume = d3.extent(visible_centroids, (d) => d.properties.volume);
+let min_max_capacity = d3.extent(visible_centroids, (d) => d.properties.capacity);
 
 let selected_info;
 $: selected_info = selected_info ? selected_info : null;
@@ -341,11 +356,11 @@ function satellite() {
                   "circle-stroke-color": "black",
                   "circle-radius": [
                       "interpolate", ["linear"],
-                      ["get", "volume"],
+                      ["get", "capacity"],
 
-                      not_aca_min_max_volume[0],
+                      not_aca_min_max_capacity[0],
                       (2 / map.getZoom() * 20),
-                      not_aca_min_max_volume[1],
+                      not_aca_min_max_capacity[1],
                       (2 / map.getZoom()) * 45,
                   ],
               }
@@ -367,11 +382,11 @@ function satellite() {
               'paint': {
                   "circle-radius": [
                       "interpolate", ["linear"],
-                      ["get", "volume"],
+                      ["get", "capacity"],
 
-                      min_max_volume[0],
+                      min_max_capacity[0],
                       (2 / map.getZoom() * 20),
-                      min_max_volume[1],
+                      min_max_capacity[1],
                       (2 / map.getZoom()) * 45,
                   ],
                   "circle-color": expression,
@@ -471,6 +486,7 @@ function satellite() {
                     */
                   popup.setHTML(`
               <div class="title">${data.currentData.name}</div><div class="close_popup">x</div>
+               <div>Max capacity ${info.capacity} hm³</div> 
               <center style='color:gold'>${data.currentData.Dia}</center>
               <div class='non_aca_current_perc_bar'></div>
               <div>${data.currentData.vol_hm3} hm³ ${+data.currentData.perc_volume}%</div></hr>
@@ -498,7 +514,10 @@ function satellite() {
                   let f = document.getElementsByClassName('see_satellite_container')[0]
                   f.appendChild(element);
 
-
+                  jQuery('.close_popup').click(function() {
+                  current_code = null;
+                  jQuery(".maplibregl-popup").hide();
+              })
 
 
                   if (data.prevData.perc_volume) {
@@ -663,9 +682,10 @@ function satellite() {
               //even if no votes, we popup the name of municipality
               popup.setHTML(`
               <div class="title">${selected_info.NAME}</div><div class="close_popup">x</div>
+              <div>Max capacity ${selected_info.capacity} hm³</div>
               <center style='color:gold'>${currentDate}</center>
               <div class='current_perc_bar'></div>
-              <div>${selected_info.volume} hm³</div></hr>
+              </hr>
               <center style='color:gold'>${historical_data.dia}</center>
               <div class='prev_perc_bar'>
                 <div class='prev_perc_bar_class'></div>
