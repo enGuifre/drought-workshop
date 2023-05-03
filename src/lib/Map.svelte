@@ -193,9 +193,9 @@ Orange #F58523     - 16% to 24.9% capacity
 Red #F15546    - 0% to 15.9% capacity
 
   */
-  let thresholdScale = {domain:[16, 25, 40, 60, 100],
+  let thresholdScale = {domain:[16, 25, 40, 60],
   //range:['#CCDFFF', '#A3B8FF', '#616EFF', '#3846D6','#2C3696']
-  range:['#2C3696', '#3846D6', '#616EFF', '#A3B8FF','#CCDFFF']
+  range:['#2C3696', '#3846D6', '#616EFF', '#A3B8FF']
   }; // Set the colors for each threshold
 
 console.warn(thresholdScale)
@@ -386,9 +386,9 @@ icgc_sat=  {
             ["get", "volume"],
           
            min_max_volume[0],
-            (2/map.getZoom()*40),
+            (2/map.getZoom()*20),
             min_max_volume[1],
-            (2/map.getZoom())*80, 
+            (2/map.getZoom())*45, 
         ],
         "circle-color": expression,
         /*    "circle-color": {
