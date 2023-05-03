@@ -237,8 +237,7 @@ sensors
   //some days are missing in the historical file!!!
 
     
-   return String(d.codi)==String(selected_info.CODI_ACA)
-   // && d.dia==prevDate   
+   return String(d.codi)==String(selected_info.CODI_ACA) && d.dia==prevDate   
   })[0]:null;
 
   $:month_historical_data=selected_info?historical.filter((d,i)=>
@@ -891,7 +890,7 @@ volume: 37.23
         f.appendChild(element);  */ 
 
         element=document.getElementsByClassName('prev_perc_bar_class')[0]
-
+            console.log(historical_data.perc_volume)
         myComponent = new MyComponent({ target: element,
                     props: 
                     {
