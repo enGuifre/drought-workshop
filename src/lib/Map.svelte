@@ -91,6 +91,11 @@ let filtered_reservoirs_not_aca_data=reservoirs_not_aca_data.filter(d=>
     }).join('/');
     if (isNaN(d.perc_volume))
     d.perc_volume=Number(d.perc_volume.replace(',','.'))
+
+    if (isNaN(d.vol_hm3))
+    d.vol_hm3=Number(d.vol_hm3.replace(',','.'))
+    
+
     return d;
 }); 
 
@@ -125,6 +130,33 @@ let year = date.getFullYear();
 
 let visible_centroids=dams_centroid.features.filter((d)=>sensors_arr.indexOf(String(d.properties.CODI_ACA))>-1);
 let not_aca_centroids=dams_centroid.features.filter((d)=>non_aca_codes_arr.indexOf(String(d.properties.CODI_ACA))>-1);
+
+
+not_aca_centroids.map((d)=>
+{
+  let data=filtered_reservoirs_not_aca_data.filter((d2,i)=>
+  {
+    if (i<5)
+    console.warn(d2)
+    return d2.Codi_ACA==d.properties.CODI_ACA
+  })[0]
+  if (data)
+  {
+    d.properties.volume=data.vol_hm3;
+    d.properties.perc_volume=data.perc_volume;
+  }
+  else
+  {
+    d.properties.volume=0;
+    d.properties.perc_volume=0;
+  }
+})
+console.warn(not_aca_centroids)
+
+let not_aca_min_max_percent = d3.extent(not_aca_centroids, (d) => d.properties.perc_volume);
+let not_aca_min_max_volume = d3.extent(not_aca_centroids, (d) => d.properties.volume);
+console.log(not_aca_min_max_percent,not_aca_min_max_volume)
+
 visible_centroids.map((d) => {
    let sensor=sensors.filter((s)=>s.codiACA==d.properties.CODI_ACA);
    d.properties.sensors=[...sensor];
@@ -163,6 +195,8 @@ sensors
   let min_max_percent = d3.extent(visible_centroids, (d) => d.properties.percent);
   let min_max_volume = d3.extent(visible_centroids, (d) => d.properties.volume);
   
+
+
   $:selected_info=null;
   let selected_data=selected_info?selected_info:null;
   let historical_data=null;
@@ -396,23 +430,42 @@ icgc_sat=  {
                     visible_centroids
                     }
                     });
+
+      let thresholdScale = {domain:[16, 25, 40, 60],
+  //range:['#CCDFFF', '#A3B8FF', '#616EFF', '#3846D6','#2C3696']
+  range:['#2C3696', '#3846D6', '#616EFF', '#A3B8FF']
+  }; 
+  /* d.properties.volume=data.vol_hm3;
+    d.properties.perc_volume=data.perc_volume; */
+      let non_aca_expression=[
+          "interpolate", ["linear"],
+            ["get", "perc_volume"]
+        ]
+        thresholdScale.domain.forEach((d,i)=>{
+        
+          non_aca_expression.push(d,thresholdScale.range[i])
+        })
+
       let dams_noaca_point_layer=  {
        'id': 'dams_noaca_point_layer',
         'type': 'circle',
         'source': 'dams_noaca_point_source',
         'paint': {
-           "circle-radius":4,
-        "circle-color": 'red',
-               
-          "circle-stroke-width": 2,
-        "circle-stroke-color": "white",
-        "circle-opacity": 1,
-
-        }
+           "circle-color": non_aca_expression,
+           "circle-stroke-width": 2,
+        "circle-stroke-color": "black",
+           "circle-radius": [
+            "interpolate", ["linear"],
+            ["get", "volume"],
+          
+           not_aca_min_max_volume[0],
+            (2/map.getZoom()*20),
+            not_aca_min_max_volume[1],
+            (2/map.getZoom())*45, 
+        ],
       }
-      map.addLayer(dams_noaca_point_layer);
-
-                                   
+    }
+      map.addLayer(dams_noaca_point_layer);                                   
       let expression=[
           "interpolate", ["linear"],
             ["get", "percent"]
