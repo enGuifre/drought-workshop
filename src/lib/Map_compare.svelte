@@ -303,7 +303,7 @@ function destroyComponent() {
     </div>
     <div class="map-overlay center"><div class="title">{currentInfo.NAME}</div>
       <div class="prevYear">
-        <div class="info"><span class="date">{month}-{selectedSatelliteYear?selectedSatelliteYear:2021}</span><span class="percent"> {prevYearInfo.perc_volume}%</span></div>
+        <div class="info"><span class="date">{month}-2022</span><span class="percent"> {prevYearInfo.perc_volume}%</span></div>
       </div>
 
       <div class="currentYear">
