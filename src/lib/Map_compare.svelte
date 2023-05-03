@@ -36,7 +36,7 @@ if (currentInfo)
  
 }
 let day = date.getDate();
-let month = (date.getMonth()+1)<10?`0${date.getMonth()+1}`:date.getMonth()+1;
+let month = (date.getMonth())<10?`0${date.getMonth()}`:date.getMonth();
 
 let year = date.getFullYear();
     let currentDate = `${day}/${month}/${year}`;
@@ -307,7 +307,7 @@ function destroyComponent() {
       </div>
 
       <div class="currentYear">
-        <div class="info"><span class="date">{day}-{month}-{year}</span><span class="percent"> {currentInfo.percent} %</span></div>
+        <div class="info"><span class="date">{month}-{year}</span><span class="percent"> {currentInfo.percent} %</span></div>
         
       </div>
     </div>
