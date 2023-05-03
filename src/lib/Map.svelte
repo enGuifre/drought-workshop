@@ -11,6 +11,9 @@
 
   /* import { munis } from "../data/municipis.js"; */
   import { dams_centroid } from "../data/dams_centroid.js";
+  import reservoirs_not_aca_data  from "../data/reservoirs_not_aca_data.json";
+  
+
   import { dams_polygon } from "../data/dams_polygon.js";
   import { dams_bbox } from "../data/dams_bbox.js";
   import  historical  from "../data/historical.json";
@@ -24,7 +27,8 @@
   export let api_data;
   let map_compare;
 
-
+ 
+console.info(reservoirs_not_aca_data)
 
   let map;
   let icgc_sat;
@@ -40,6 +44,34 @@
 
  
 let sensors_arr=[...new Set(sensors.map(d=>String(d.codiACA)))];
+let non_aca_codes_arr=[...new Set(reservoirs_not_aca_data.map(d=>String(d.Codi_ACA)))];
+
+console.info(non_aca_codes_arr,reservoirs_not_aca_data.filter((d,i)=>
+{
+  if (i<20)
+  console.log(d.Codi_ACA)
+  return non_aca_codes_arr.indexOf(String(d.Codi_ACA))>-1
+}))
+let filtered_reservoirs_not_aca_data=reservoirs_not_aca_data.filter(d=>
+{
+  return non_aca_codes_arr.indexOf(String(d.Codi_ACA))>-1
+})
+  .map((d,i)=>
+{
+
+  d.Dia=d.Dia.split('/').map((d2,i)=>
+    {
+      if (String(d2.length)==1)
+      return String(0+d2)
+      else
+      return String(d2)
+    }).join('/');
+    if (isNaN(d.perc_volume))
+    d.perc_volume=Number(d.perc_volume.replace(',','.'))
+    return d;
+}); 
+console.info(filtered_reservoirs_not_aca_data.filter(d=>d.Codi_ACA==='E0750'))
+
 let date = new Date();
 
 
@@ -69,7 +101,7 @@ let year = date.getFullYear();
     console.warn(currentDate,prevDate)
 
 let visible_centroids=dams_centroid.features.filter((d)=>sensors_arr.indexOf(String(d.properties.CODI_ACA))>-1);
-
+let not_aca_centroids=dams_centroid.features.filter((d)=>non_aca_codes_arr.indexOf(String(d.properties.CODI_ACA))>-1);
 visible_centroids.map((d) => {
    let sensor=sensors.filter((s)=>s.codiACA==d.properties.CODI_ACA);
    d.properties.sensors=[...sensor];
@@ -297,6 +329,17 @@ icgc_sat=  {
       };
       map.addLayer(dams_pol_layer);
 
+      map.addSource('dams_noaca_point_source', {
+                    'type': 'geojson',
+                    'data': {
+                    "type": "FeatureCollection",
+                    "name": "dams_centroid",
+                    "crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+                    "features":
+                    not_aca_centroids
+                    }
+                    });
+
       map.addSource('dams_point_source', {
                     'type': 'geojson',
                     'data': {
@@ -307,23 +350,24 @@ icgc_sat=  {
                     visible_centroids
                     }
                     });
+      let dams_noaca_point_layer=  {
+       'id': 'dams_noaca_point_layer',
+        'type': 'circle',
+        'source': 'dams_noaca_point_source',
+        'paint': {
+           "circle-radius":4,
+        "circle-color": 'red',
+               
+          "circle-stroke-width": 2,
+        "circle-stroke-color": "white",
+        "circle-opacity": 1,
 
-                  /*   map.setPaintProperty(
-                        // 'slumaps_nairobi_city',
-                        'mining_data',
-                        "fill-color", style.reduce(function(memo, val, i) {
-                            memo.stops.push([val.name, val.color])
-                            return memo;
-                        }, {
-                            "property": this_app.active_cat,
-                            "type": "categorical",
-                            "stops": []
-                        })
-                        //.push('#fff')
-                    ) */
+        }
+      }
+      map.addLayer(dams_noaca_point_layer);
 
-//let thresholdScale = {domain:[10, 20, 50, 80, 100],                    
-let expression=[
+                                   
+      let expression=[
           "interpolate", ["linear"],
             ["get", "percent"]
         ]
@@ -332,7 +376,7 @@ let expression=[
           expression.push(d,thresholdScale.range[i])
         })
 
-    let dams_point_layer=  {
+     let dams_point_layer=  {
        'id': 'dams_point_layer',
         'type': 'circle',
         'source': 'dams_point_source',
@@ -423,7 +467,7 @@ let expression=[
 
  /*    map.on("mouseenter", 'dams_point_layer',function (e) {
 
-alert('entrado')
+
     }) */
     // function onmousemove_ev(e)
     // {
@@ -453,9 +497,185 @@ alert('entrado')
      // jQuery(".maplibregl-popup").hide();
 
     })
+    
+    function searchRecord(jsonData, dateString) {
+    const record = jsonData.find((item) => item.Dia === dateString);
+    if (record) {
+      return record;
+    }
+    const prevDate = getPreviousDate(dateString);
+    if (prevDate) {
+      return searchRecord(jsonData, prevDate);
+    }
+    return null;
+  }
+  
+  function getPreviousDate(dateString) {
+    const [day, month, year] = dateString.split('/');
+    const date = new Date(year, month - 1, day);
+    date.setDate(date.getDate() - 1);
+    const prevDate = new Date(date);
+    const prevDateStr = prevDate.toLocaleDateString('en-GB');
+    if (prevDateStr === 'Invalid Date') {
+      return null;
+    }
+    return prevDateStr;
+  }
+  
+  //debugger
+    map.on("mouseenter", 'dams_noaca_point_layer',function (e) {
+      
+      var features = map.queryRenderedFeatures(e.point);
+
+if (features && features.length>0)
+{
+      let info=features[0].properties;
+      console.log(info)
+      //many features don't have data for every day"! lets search closest one
+      let f=filtered_reservoirs_not_aca_data.filter((d,i)=>
+      {
+        
+        return String(d.Codi_ACA)===String(info.CODI_ACA)
+      })
+
+      let data={};
+      data.currentData=searchRecord(filtered_reservoirs_not_aca_data,'03/05/2023');
+
+      data.prevData=searchRecord(filtered_reservoirs_not_aca_data,'03/05/2022');
+
+      console.log(data)
+        
+    
+
+      if (data.currentData)
+      {
+        data.prevData.data=data.prevData.data || {vol_hm3:10,perc_volume:30}
+        console.info(data.prevData)
+        /*   
+        currentData
+        {
+              "name": "Rialb",
+              "cap_hm3": 403552,
+              "Codi_ACA": "E0240",
+              "Dia": "30/4/2023",
+              "vol_hm3": "23,24",
+              "perc_volume": "5,76"
+          }
+          */
+          popup.setHTML(`
+            <div class="title">${data.currentData.name}</div><div class="close_popup">x</div>
+            <center style='color:gold'>${data.currentData.Dia}</center>
+            <div class='non_aca_current_perc_bar'></div>
+            <div>${data.currentData.vol_hm3} hm³ ${+data.currentData.perc_volume}%</div></hr>
+            <center style='color:gold'>${data.prevData.Dia}</center>
+            <div class='prev_perc_bar'>
+              <div class='nonaca_prev_perc_bar_class'></div>
+            </div>
+            <div>volumes: ${data.prevData.data.vol_hm3} hm³ ${+data.prevData.perc_volume}%</div>
+            <div class='see_satellite_container'></div>
+            <div class='lineChart_container'></div>
+
+            
+          `);
+          jQuery(".maplibregl-popup").show();
+      
+        let coords=features[0].geometry.coordinates;
+        let latlng=new LngLat(coords[0], coords[1])
+        
+        popup.addTo(map);
+        popup.setLngLat(latlng);
+
+         var element = document.createElement("div");
+        element.classList.add('see_satellite');
+        let f=document.getElementsByClassName('see_satellite_container')[0]
+        f.appendChild(element); 
+
+      
+        
+
+        if (data.prevData.perc_volume)
+        {
+          
+          let element=document.getElementsByClassName('nonaca_prev_perc_bar_class')[0]
+
+            let myComponent = new MyComponent({ target: element,
+                        props: 
+                        {
+                          data:[{perc_volume:data.prevData.perc_volume,dia:data.prevData.Dia}]
+                        }
+                      });  
+
+           
+          }
+
+          if (data.currentData.perc_volume)
+        {
+          
+          
+          let element=document.getElementsByClassName('non_aca_current_perc_bar')[0]
+
+            let myComponent = new MyComponent({ target: element,
+                        props: 
+                        {
+                          data:[{perc_volume:data.currentData.perc_volume,dia:data.currentData.Dia}]
+                        }
+                      });  
+            let currentInfo=features[0].properties;
+            currentInfo.percent=data.currentData.perc_volume;
+
+                      let satelliteBtn = new MyComponent({ target: element,
+                    props: {
+                      //current situation
+                      data:  currentInfo,
+                      //prev year situaton
+                      prevYearData:{
+                        NAME:data.prevData.name,
+                        perc_volume:data.prevData.perc_volume,
+                        day:data.prevData.Dia}
+
+                        /*
+                        let satelliteBtn = new MyComponent({ target: element,
+                    props: {
+                      //current situation
+                      data:  selected_info,
+                      //prev year situaton
+                      prevYearData:historical_data
+                      
+
+                      
+            } }); 
+            */
+                      /*
+                       class="map-overlay center"><div class="title">{currentInfo.NAME}</div>
+      <div class="prevYear">
+        <div class="info"><span class="date">{month}-{selectedSatelliteYear?selectedSatelliteYear:2021}</span><span class="percent"> {prevYearInfo.perc_volume}%</span></div>
+      </div>
+
+      <div class="currentYear">
+        <div class="info"><span class="date">{day}-{month}-{year}</span><span class="percent"> {currentInfo.percent} %
+                       */
+                      
+
+                      
+            } }); 
+          }
+                  
+      } 
+      
+
+
+
+
+      
+
+    }
+    })
+    
+
+
     map.on("mouseenter", 'dams_point_layer',function (e) {
 
-      console.warn('mouseenter circle')
+      
       let selected_info_popup;
       var features = map.queryRenderedFeatures(e.point);
       
@@ -604,7 +824,7 @@ console.warn(selected_info,historical_data)
 
 
 
-                      myComponent = new MyComponent({ target: element,
+        myComponent = new MyComponent({ target: element,
                     props: 
                     {
                       points_data: 

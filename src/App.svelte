@@ -4,6 +4,8 @@
   /* import { api } from '../services/api.js'; */
   import Map from "./lib/Map.svelte";
   import Map_compare from "./lib/Map_compare.svelte";
+
+  //import api_data_backup from "./lib/data/api_data_backup.json";
   import { onMount } from 'svelte';
   let w;
   let api_data;

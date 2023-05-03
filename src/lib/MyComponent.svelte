@@ -42,7 +42,7 @@
         detail: {
           map_compare: true,
           currentInfo:data,
-          prevYearInfo:prevYearData
+          prevYearInfo:prevYearData?prevYearData:'2022'
         }
       });
       dispatchEvent(event);
