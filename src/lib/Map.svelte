@@ -41,9 +41,13 @@ console.info(reservoirs_not_aca_data)
   function showOverlayFunc(){
     showOverlay=true;
   }
-
+  let s=0;
   function searchRecord(jsonData, dateString) {
-    const record = jsonData.find((item) => item.Dia === dateString);
+
+    if (s==0) console.log(jsonData)
+    
+    s++
+    const record = jsonData.find((item) => item.dia === dateString);
     if (record) {
       return record;
     }
@@ -69,12 +73,17 @@ console.info(reservoirs_not_aca_data)
 let sensors_arr=[...new Set(sensors.map(d=>String(d.codiACA)))];
 let non_aca_codes_arr=[...new Set(reservoirs_not_aca_data.map(d=>String(d.Codi_ACA)))];
 
-console.info(non_aca_codes_arr,reservoirs_not_aca_data.filter((d,i)=>
+historical.forEach((d)=>
 {
-  if (i<20)
-  console.log(d.Codi_ACA)
-  return non_aca_codes_arr.indexOf(String(d.Codi_ACA))>-1
-}))
+  d.dia=d.dia.split('/').map((d,i)=>
+  {
+    if (String(d.length)==1)
+    return String(0+d)
+    else
+    return String(d)
+  }).join('/')
+});
+
 let filtered_reservoirs_not_aca_data=reservoirs_not_aca_data.filter(d=>
 {
   return non_aca_codes_arr.indexOf(String(d.Codi_ACA))>-1
@@ -82,7 +91,7 @@ let filtered_reservoirs_not_aca_data=reservoirs_not_aca_data.filter(d=>
   .map((d,i)=>
 {
 
-  d.Dia=d.Dia.split('/').map((d2,i)=>
+  d.dia=d.Dia.split('/').map((d2,i)=>
     {
       if (String(d2.length)==1)
       return String(0+d2)
@@ -121,12 +130,13 @@ let month =date.getMonth()+1;
 //(date.getMonth()+1)<10?`0${date.getMonth()+1}`:date.getMonth()+1;
 
 let year = date.getFullYear();
-    let currentDate = `${day}/${month}/${year}`;
+let currentDate = `${day}/${month}/${year}`;
   //  let prevDate=`${day}/${month}/${year-1}`;
 
+  ////some days are missing in the historical file!!! 
   let prevDate=`29/4/${year-1}`;
 
-    console.warn(currentDate,prevDate)
+  console.warn(currentDate,prevDate)
 
 let visible_centroids=dams_centroid.features.filter((d)=>sensors_arr.indexOf(String(d.properties.CODI_ACA))>-1);
 let not_aca_centroids=dams_centroid.features.filter((d)=>non_aca_codes_arr.indexOf(String(d.properties.CODI_ACA))>-1);
@@ -136,8 +146,7 @@ not_aca_centroids.map((d)=>
 {
   let data=filtered_reservoirs_not_aca_data.filter((d2,i)=>
   {
-    if (i<5)
-    console.warn(d2)
+    
     return d2.Codi_ACA==d.properties.CODI_ACA
   })[0]
   if (data)
@@ -155,7 +164,7 @@ console.warn(not_aca_centroids)
 
 let not_aca_min_max_percent = d3.extent(not_aca_centroids, (d) => d.properties.perc_volume);
 let not_aca_min_max_volume = d3.extent(not_aca_centroids, (d) => d.properties.volume);
-console.log(not_aca_min_max_percent,not_aca_min_max_volume)
+
 
 visible_centroids.map((d) => {
    let sensor=sensors.filter((s)=>s.codiACA==d.properties.CODI_ACA);
@@ -197,57 +206,42 @@ sensors
   
 
 
-  $:selected_info=null;
-  let selected_data=selected_info?selected_info:null;
+  let selected_info
+  $:selected_info=selected_info?selected_info:null;;
+  //let selected_data=selected_info?selected_info:null;
   let historical_data=null;
-/* 
-  {
-      "dia": "1/1/2000",
-      "estacio": "Boadella",
-      "codi": 2200015,
-      "nivell_absolut": 147.27,
-      "perc_volume": 50.8,
-      "volume": 31.02
-    },
-*/
+  function format_date(param)
+{
+  return param<10?String(0)+String(param):param;
+}
 
-/*$:historical_data=
-  {
-    
-   if (selected_info)
-   {
-      let h=historical.filter((d,i)=>
-        { 
-        //some days are missing in the historical file!!!
 
-          
-        return String(d.codi)==String(selected_info.CODI_ACA)
-        // && d.dia==prevDate   
-        }
-        )
-      console.log(h)
-      return searchRecord(h,'03/05/2022')[0];
-   } 
- 
-  }
- */
-
-  $:historical_data=selected_info?historical.filter((d,i)=>
+  //historical_data=searchRecord(historical_data,'02/05/2022') || null;
+  $:historical_data=selected_info?searchRecord(historical.filter((d,i)=>
   { 
   //some days are missing in the historical file!!!
-
-    
-   return String(d.codi)==String(selected_info.CODI_ACA) && d.dia==prevDate   
-  })[0]:null;
+  if (i==0) console.warn(d,year-1)
+   return String(d.codi)==String(selected_info.CODI_ACA)
+   && d.dia.split('/')[2]==year-1
+   // && d.dia==prevDate   
+  }),String(format_date(day)+'/'+format_date(month)+'/')+String(year-1)):'no data??';
 
   $:month_historical_data=selected_info?historical.filter((d,i)=>
   {  
-//     if (i==0)
-// console.warn(d,selected_info) //25/4/2023
+    if (i==0)
+    {
+      console.log(selected_info)
+      console.warn(day,month) 
+      console.info(String(format_date(day)+'/'+format_date(month)))
+      console.warn(String(d.dia.split('/')[0]+'/'+d.dia.split('/')[1]))
+    }
+
+//25/04/2022
+
     return String(d.codi)==String(selected_info.CODI_ACA) && 
-    String(d.dia.split('/')[0]+'/'+d.dia.split('/')[1])==String(day+'/'+month)
+    String(d.dia.split('/')[0]+'/'+d.dia.split('/')[1])==String(format_date(day)+'/'+format_date(month))
    
-  }):null;
+  }):'no month data??';
 
 /*
   $:
@@ -305,50 +299,21 @@ console.warn(thresholdScale)
     }
     
 
-          /*
-       The [lng, lat] pairs are the southwestern and northeastern
-*  corners of the specified geographical bounds.
-
-document.getElementById('fit').addEventListener('click', () => {
-map.fitBounds([
-[32.958984, -5.353521], // southwestern corner of the bounds
-[43.50585, 5.615985] // northeastern corner of the bounds
-]);
-
-     */
   }
-  function update_clicked()
-  {
-    /* 
-    {
-      console.log(selected_info)
-      debugger
-      
-  
-    } */
-    if (selected_info)
-    clicked_code=selected_info.CODI_ACA;
-    
-  }
+ 
   onMount(() => {
     const data = [];
 
-    /*
-    let thresholdScale = {domain:[16, 25, 40, 60, 100],
-  range:['#CCDFFF', '#A3B8FF', '#616EFF', '#3846D6','#2C3696']
-  }; // Set the colors for each threshold
-  */
+  
     
     map = new Map({
       container: "map", // container id
-      //style: 'mapbox://styles/mapbox/streets-v8',
+      
       style: mapStyle,
        center:[1.05, 41.4],
-       //center:[2.423955,41.960341],
-
-      //center: [141.15448379999998, 39.702053　],
+      
       zoom: 7,
-      //maxBounds:[[-0.665553,40.45029], [2.276123,42.462188]],
+      
     maxBounds: [
     
     [-2.65, 40.328],
@@ -367,11 +332,9 @@ map.fitBounds([
     
     'type': 'raster',
     'tiles': [
-      //"https://geoserveis.icgc.cat/icc_mapesmultibase/noutm/wmts/topo/GRID3857/{z}/{x}/{y}.png",
+
       'https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=1020&HEIGHT=836&TIME=2023-03'
 
-      //'https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2rgb&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:25831&BBOX={bbox-epsg-3857}&WIDTH=1020&HEIGHT=836&TIME=2015-12'
-      //206985.645933014,4480000,573014.354066986,4780000
     ],
     'tileSize': 126,
   
@@ -503,7 +466,7 @@ icgc_sat=  {
         }
       }
       map.addLayer(dams_point_layer);
-  console.warn(map.getStyle().layers)
+  
    
     });
 
@@ -534,61 +497,7 @@ icgc_sat=  {
       },
     });
 
-    //popup.addTo(map);
-    
- /*    map.on('click',function(e)
-    {
-      
-
-      
-      var features = map.queryRenderedFeatures(e.point, {
-                    layers: ['dams_pol_layer','dams_point_layer']
-                });
-      
-      if (features && features.length>0)
-      {
-      
-      selected_info=features[0].properties;
-      
-      console.log(month_historical_data)
    
-
-      }
-      else
-      {
-        selected_info=null;
-      }
-      update_clicked();
-      //showOverlayFunc();
-      
-    }) */
-
- /*    map.on("mouseenter", 'dams_point_layer',function (e) {
-
-
-    }) */
-    // function onmousemove_ev(e)
-    // {
-    //   console.log('onmousemove')
-    //   var features = map.queryRenderedFeatures(e.point, {
-    //                 layers: ['dams_pol_layer','dams_point_layer']
-    //             });
-      
-    //   if (features && features.length>0)
-    //   {
-      
-    //   selected_info=features[0].properties;
-      
-      
-   
-
-    //   }
-    //   else
-    //   {
-    //     selected_info=null;
-    //   }
-    //   update_clicked();
-    // }
     map.on("mouseleave", 'dams_point_layer',function (e) {
 
      // if (!clicked_code)
@@ -621,7 +530,6 @@ if (features && features.length>0)
 
       console.log(data)
         
-    
 
       if (data.currentData)
       {
@@ -775,8 +683,10 @@ if (features && features.length>0)
        else
        {
         selected_info=features[0].properties;
+        /* selected_data=features[0].properties; */
         current_code=selected_info.CODI_ACA;
         selected_info_popup=features[0].properties;
+        console.log(historical_data)
        }
       
       }
@@ -813,10 +723,17 @@ volume: 37.23
 */
 
 //data.prevData=.searchRecord(filtered_reservoirs_not_aca_data,'03/05/2022');
-      historical_data=historical.filter(d=>
-              String(d.codi)==String(selected_info.CODI_ACA) && d.dia==prevDate
-          )
-      console.log(historical_data)    
+
+console.log(historical_data)
+
+
+//historical_data=searchRecord(historical_data,'02/05/2022') || null;
+if (!historical_data)
+{
+      console.log(historical_data)   
+      
+}     
+
         //  .searchRecord(filtered_reservoirs_not_aca_data,'03/05/2022');
       console.warn(selected_info,historical_data)
       
@@ -830,11 +747,11 @@ volume: 37.23
             <center style='color:gold'>${currentDate}</center>
             <div class='current_perc_bar'></div>
             <div>${selected_info.volume} hm³</div></hr>
-            <center style='color:gold'>${prevDate}</center>
+            <center style='color:gold'>${historical_data.dia}</center>
             <div class='prev_perc_bar'>
               <div class='prev_perc_bar_class'></div>
                 </div>
-            <div>volume: ${historical_data[0].volume} hm³</div>
+            <div>volume: ${historical_data.volume} hm³</div>
             <div class='see_satellite_container'></div>
             <div class='lineChart_container'></div>
 
@@ -888,13 +805,14 @@ volume: 37.23
         element.classList.add('prev_perc_bar_class');
         var f=document.getElementsByClassName('prev_perc_bar')[0]
         f.appendChild(element);  */ 
+        //historical_data=searchRecord(historical_data,'02/05/2022') || null;
 
         element=document.getElementsByClassName('prev_perc_bar_class')[0]
             console.log(historical_data.perc_volume)
         myComponent = new MyComponent({ target: element,
                     props: 
                     {
-                      data:[{perc_volume:historical_data.perc_volume,dia:prevDate}]                       
+                      data:[{perc_volume:historical_data.perc_volume,dia:historical_data.dia}]                       
                     }
                   }); 
 
@@ -903,7 +821,8 @@ volume: 37.23
         var f=document.getElementsByClassName('lineChart_container')[0]
         f.appendChild(element);  
 
-
+        console.warn(month_historical_data)
+        
 
         myComponent = new MyComponent({ target: element,
                     props: 
