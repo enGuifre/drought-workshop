@@ -4,7 +4,8 @@
   import { onMount, onDestroy } from "svelte";
   import { Map, NavigationControl, Popup, LngLat } from "maplibre-gl";
   import "maplibre-gl/dist/maplibre-gl.css";
-  import * as d3 from "d3";
+  
+  import {extent} from "d3-array";
   import jQuery from "jquery";
 
   import YearHistory from "./YearHistory.svelte";
@@ -129,9 +130,9 @@ not_aca_centroids.map((d) => {
   }
 });
 
-let not_aca_min_max_percent = d3.extent(not_aca_centroids, (d) => d.properties.perc_volume);
-let not_aca_min_max_volume = d3.extent(not_aca_centroids, (d) => d.properties.volume);
-let not_aca_min_max_capacity = d3.extent(not_aca_centroids, (d) => d.properties.capacity);
+let not_aca_min_max_percent = extent(not_aca_centroids, (d) => d.properties.perc_volume);
+let not_aca_min_max_volume = extent(not_aca_centroids, (d) => d.properties.volume);
+let not_aca_min_max_capacity = extent(not_aca_centroids, (d) => d.properties.capacity);
 
 
 
@@ -159,11 +160,11 @@ visible_centroids.map((d) => {
   });
 });
 
-let min_max_percent = d3.extent(visible_centroids, (d) => d.properties.percent);
-let min_max_volume = d3.extent(visible_centroids, (d) => d.properties.volume);
-let min_max_capacity = d3.extent(visible_centroids, (d) => d.properties.capacity);
+let min_max_percent = extent(visible_centroids, (d) => d.properties.percent);
+let min_max_volume = extent(visible_centroids, (d) => d.properties.volume);
+let min_max_capacity = extent(visible_centroids, (d) => d.properties.capacity);
 
-let all_min_max_capacity=d3.extent([...not_aca_min_max_capacity,...min_max_capacity])
+let all_min_max_capacity=extent([...not_aca_min_max_capacity,...min_max_capacity])
 console.warn(all_min_max_capacity);
 let selected_info;
 $: selected_info = selected_info ? selected_info : null;
@@ -201,9 +202,9 @@ Red #F15546    - 0% to 15.9% capacity
 
   */
   let thresholdScale = {
-    domain: [16, 25, 40, 60],
+    domain: [16, 25, 40, 60,100],
     
-    range: ['#2C3696', '#3846D6', '#616EFF', '#A3B8FF']
+    range: ['#2C3696', '#3846D6', '#616EFF', '#A3B8FF','#FFFFFF']
 }; // Set the colors for each threshold
 
 console.warn(thresholdScale)
@@ -335,9 +336,9 @@ function satellite() {
           });
 
           let thresholdScale = {
-              domain: [16, 25, 40, 60],
+              domain: [16, 25, 40, 60,100],
               //range:['#CCDFFF', '#A3B8FF', '#616EFF', '#3846D6','#2C3696']
-              range: ['#2C3696', '#3846D6', '#616EFF', '#A3B8FF']
+              range: ['#2C3696', '#3846D6', '#616EFF', '#A3B8FF','#FFFFFF']
           };
           /* d.properties.volume=data.vol_hm3;
             d.properties.perc_volume=data.perc_volume; */
@@ -499,7 +500,7 @@ function satellite() {
               <div class='prev_perc_bar'>
                 <div class='nonaca_prev_perc_bar_class'></div>
               </div>
-              <div>${data.prevData.vol_hm3} hm³</div></hr>
+              <div>${data.prevData.data.vol_hm3} hm³</div></hr>
               
               <div class='see_satellite_container'></div>
               
@@ -572,27 +573,7 @@ function satellite() {
                                   day: data.prevData.Dia
                               }
 
-                              /*
-                          let satelliteBtn = new MyComponent({ target: element,
-                      props: {
-                        //current situation
-                        data:  selected_info,
-                        //prev year situaton
-                        prevYearData:historical_data
-                        
-
-                        
-              } }); 
-              */
-                              /*
-                        class="map-overlay center"><div class="title">{currentInfo.NAME}</div>
-        <div class="prevYear">
-          <div class="info"><span class="date">{month}-{selectedSatelliteYear?selectedSatelliteYear:2021}</span><span class="percent"> {prevYearInfo.perc_volume}%</span></div>
-        </div>
-
-        <div class="currentYear">
-          <div class="info"><span class="date">{day}-{month}-{year}</span><span class="percent"> {currentInfo.percent} %
-                        */
+            
 
 
 
@@ -799,7 +780,6 @@ function satellite() {
               console.info(selected_info, historical_data)
 
 
-
               let satelliteBtn = new MyComponent({
                   target: element,
                   props: {
@@ -863,7 +843,9 @@ function satellite() {
  
   <div class="map-legend">
   <MapLegend {thresholdScale}/>
+  
   </div>
+  <div class="circles_info">Mida dels cercles proporcional a la capacitat màxima<br>Cercles depenents d'ACA amb ...</div>
   <div class="map" id="map" />
 </div>
 
@@ -871,6 +853,25 @@ function satellite() {
 
 <style>
 
+
+.circles_info {
+    position: absolute;
+    z-index: 9999999;
+    background: black;
+    border: 1px solid white;
+
+
+    padding: 10px;
+    overflow-y: auto;
+    width: auto;
+    min-width: 100px;
+    height: auto;
+    border: 1px solid grey;
+    font-size: 13px;
+    right: 40vw;
+    bottom: 6%;
+
+  }
 
   .map-overlay {
     position: absolute;

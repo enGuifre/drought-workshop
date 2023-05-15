@@ -30,7 +30,7 @@ let year = date.getFullYear();
 
    $:{
       if (selectedSatelliteYear) {
-        //alert(selectedSatelliteYear)
+        alert(selectedSatelliteYear)
           console.log(`https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&WIDTH=126&HEIGHT=126&BBOX={bbox-epsg-3857}&TIME=${selectedSatelliteYear}-${month}&dt=${Date.now()}`)
               // Set the tile url to a cache-busting url (to circumvent browser caching behaviour):
               beforeMap.getSource('icgc_sat_source_prev').tiles = [ `https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&WIDTH=126&HEIGHT=126&BBOX={bbox-epsg-3857}&TIME=${selectedSatelliteYear}-${month}`]

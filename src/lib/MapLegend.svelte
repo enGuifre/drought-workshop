@@ -14,11 +14,16 @@
       {
         if (i==thresholdScale.domain.length-1)
         {
-          return "> "+d.toString()+'%';
+          return "> "+thresholdScale.domain[i-1]+'%';
         }
         else
         {
-          return d.toString()+"-"+thresholdScale.domain[i+1].toString()+'%';
+         
+            
+            return thresholdScale.domain[i-1].toString()+'-'+d.toString()+'%';
+          
+        
+          
         }
       }
       
@@ -31,6 +36,7 @@ let thresholdScale = {domain:[16, 25, 40, 60, 100],
 
   */
 </script>
+<span>Nivell d'aigua</span>
 {#each labels as label,i}
   <div class='scale_container'>
     <div>
@@ -49,8 +55,8 @@ let thresholdScale = {domain:[16, 25, 40, 60, 100],
     .scale_color 
     {
       margin-top: 5px;
-        width: 14px;
-      height: 14px;
+        width: 16px;
+      height: 15px;
       border-radius: 50%;
       display: inline-block;
       margin-left: 5px;

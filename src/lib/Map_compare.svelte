@@ -4,17 +4,13 @@
   import { Map, NavigationControl, Popup, LngLat } from "maplibre-gl";
   import * as Compare from "@maplibre/maplibre-gl-compare";
   import "maplibre-gl/dist/maplibre-gl.css";
-  import * as d3 from "d3";
+  
   import jQuery from "jquery";
-  /* import { createEventDispatcher } from 'svelte'; */
-  //import * as EventEmitter from "events";
+  
   import EventEmitter from 'events';
   import { mapStyle } from "../data/mapStyle";
   import { dams_bbox } from "../data/dams_bbox.js";
 
-  /* import Compare from './compare.js'; */
-  /* let helper = new Helper(); */
-   //$:satellite=null;
    let beforeMap;
    let icgc_sat_prev;
    let selectedSatelliteYear;
@@ -58,9 +54,7 @@ let year = date.getFullYear();
 
           // Force a repaint, so that the map will be repainted without you having to touch the map
           beforeMap.triggerRepaint()
-            
-              /* beforeMap.removeLayer('icgc_sat_prev');
-              beforeMap.addLayer(icgc_sat_prev); */
+                      
       }
 
    }
@@ -94,15 +88,16 @@ let year = date.getFullYear();
      coords[0] // northeastern corner of the bounds
      ]);
  
-
+     let month = (date.getMonth())<10?`0${date.getMonth()}`:date.getMonth();
+     console.warn(month)
       afterMap.addSource('icgc_sat_source_now', {
     
     'type': 'raster',
     'tiles': [
       
-      'https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=126&HEIGHT=126&TIME=2023-03'
+      'https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=512&HEIGHT=512&TIME=2023-'+(date.getMonth()-2)
     ],
-    'tileSize': 126,
+    'tileSize': 512,
   
     })
       beforeMap.addSource('icgc_sat_source_prev', {
@@ -110,9 +105,9 @@ let year = date.getFullYear();
     'type': 'raster',
     'tiles': [
       
-      'https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=126&HEIGHT=126&TIME=2022-02'
+      'https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=512&HEIGHT=512&TIME=2022-'+month
     ],
-    'tileSize': 126,
+    'tileSize': 512,
   
     })
 
@@ -134,44 +129,7 @@ visibility: 'none'
     beforeMap.addLayer(icgc_sat_prev);
 
     
-    beforeMap.on("render", function() {
-
-      if (beforeMap.isStyleLoaded())
-      {
-        console.log('READY?????')
-      }
-      else
-      {
-        console.log('READY-----')
-      }
-  //if(!beforeMap.loaded()) {
- /*    if (beforeMap.isSourceLoaded('icgc_sat_prev'))
-    {
-      console.log('isSourceLoaded')
-    } */
-    //beforeMap.featuresIn(...);
-    
-  
-});
-
-  /*   let i=0;
-    beforeMap.on('sourcedata', (e)=> {
-      
-      i++;      
-      if (i==50)
-    //if (beforeMap.loaded()) 
-    {
-     console.log('all tiles are loaded ???')
-
-
-     // turn off sourcedata listener if its no longer needed
-     beforeMap.off('sourcedata');
-     
-    }
-}); */
-    
-    
-
+   
     afterMap.addLayer({
 
       'id': 'icgc_sat',
@@ -195,15 +153,7 @@ visibility: 'none'
       });
       beforeMap.setLayoutProperty('icgc_sat_prev','visibility', 'visible');
       
-      //satellite=true;
-   /*    setTimeout(function()
-      {
-        console.warn('remove')
-        compare.remove();
-        //back to previous state, looks like only afterMap stays
-        afterMap.setLayoutProperty('icgc_sat','visibility', 'none');
-      },6000); */
-
+  
     
     })
    }
@@ -213,44 +163,7 @@ visibility: 'none'
     onMount_actions()
     else 
     alert('do nothing')
-    /*
-    var beforeMap = new Map({
-        container: "before",
-        style:
-          "https://api.maptiler.com/maps/hybrid/style.json?key=YymZPIGfniu7apIvln6X",
-        center: [7.221275, 50.326111],
-        zoom: 15,
-      });
-
-      var afterMap = new Map({
-        container: "after",
-        style:
-          "https://api.maptiler.com/maps/streets/style.json?key=YymZPIGfniu7apIvln6X",
-        center: [7.221275, 50.326111],
-        zoom: 15,
-      });
-      */
-
-    
-
-  
-      
-  
-
-
-      // Get Current position - this will return the slider's current position, in pixels
-// compare.currentPosition;
-
-// // Set Position - this will set the slider at the specified (x) number of pixels from the left-edge or top-edge of viewport based on swiper orientation
-// compare.setSlider(x);
-
-// //Listen to slider movement - and return current position on each slideend
-// compare.on('slideend', (e) =&gt; {
-//   console.log(e.currentPosition);
-// });
-
-// //Remove - this will remove the compare control from the DOM and stop synchronizing the two maps.
-// compare.remove();
+   
   })
   let showComponent = true;
 
@@ -268,13 +181,7 @@ function destroyComponent() {
 </script>
 
 <svelte:head>
-<!--
-<script src="https://unpkg.com/maplibre-gl@2.1.6/dist/maplibre-gl.js"></script>
-<link href="https://unpkg.com/maplibre-gl@2.1.6/dist/maplibre-gl.css" rel="stylesheet"> 
-<script src="https://rawcdn.githack.com/astridx/astridx.github.io/a9d7297a4fe1e3a4d7ebeb1e4e662fd1339ef3b5/maplibreexamples/plugins/maplibre-gl-compare.js"></script>
--->
 
-<!--   on:click={satellite_date(2011)}>2011 -->
   <link rel="stylesheet" href="https://rawcdn.githack.com/astridx/astridx.github.io/a9d7297a4fe1e3a4d7ebeb1e4e662fd1339ef3b5/maplibreexamples/plugins/maplibre-gl-compare.css" type="text/css" />
 
 
@@ -307,36 +214,12 @@ function destroyComponent() {
       </div>
 
       <div class="currentYear">
-        <div class="info"><span class="date">{month}-{year}</span><span class="percent"> {currentInfo.percent} %</span></div>
+        <!-- we have to define -2 months for current year bc often missing the satellite images -->
+        <div class="info"><span class="date">{String(0)+(date.getMonth()-2)}-{year}</span><span class="percent"> {currentInfo.percent} %</span></div>
         
       </div>
     </div>
-   <!--  <div class="map-overlay prevYear">
-      
-      
-      <h4>{prevYearInfo.perc_volume} %</h4>
-      
-        <div class="story" style="display: block;">
-            <button class:btn-active={selectedSatelliteYear === "2020"}
-            on:click={() => (selectedSatelliteYear = "2020")}>2020
-          
-          </button>
-        </div>  
-        <div class="story" style="display: block;">
-          <button class:btn-active={selectedSatelliteYear === "2019"}
-          on:click={() => (selectedSatelliteYear = "2019")}>2019
-        
-           </button>
-          
-        </div>    
-    </div> -->
-   <!--  <div class="map-overlay currentYear">
-      <h2>{day}-{month}-{year}</h2>
-      
-      <h4>{currentInfo.percent} %  </h4>
-      
-         
-    </div> -->
+   
     
     {/if}
 
