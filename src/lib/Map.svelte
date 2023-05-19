@@ -491,7 +491,7 @@ function satellite() {
                     */
                   popup.setHTML(`
               <div class="title">${data.currentData.name}</div><div class="close_popup">x</div>
-               <div>Max capacity <span style="color:#00bcff">${info.capacity} hm³</span></div> 
+               <div>Capacitat màxima <span style="color:#00bcff">${info.capacity} hm³</span></div> 
               <div style='color:gold'>${data.currentData.Dia}</div>
               <div class='non_aca_current_perc_bar'></div>
 
@@ -669,7 +669,7 @@ function satellite() {
               //even if no votes, we popup the name of municipality
               popup.setHTML(`
               <div class="title">${selected_info.NAME}</div><div class="close_popup">x</div>
-              <div>Max capacity <span style="color:#00bcff">${selected_info.capacity}</span> hm³</div>
+              <div>Capacitat màxima <span style="color:#00bcff">${selected_info.capacity}</span> hm³</div>
               <div style='color:gold'>${currentDate}</div>
               <div class='current_perc_bar'></div>
               </hr>
@@ -845,7 +845,7 @@ function satellite() {
   <MapLegend {thresholdScale}/>
   
   </div>
-  <div class="circles_info">Mida dels cercles proporcional a la capacitat màxima<br>Cercles depenents d'ACA amb ...</div>
+  <div class="circles_info">Mida dels cercles proporcional a la capacitat màxima.<br>Cercles amb marges blancs: embassaments de l'ACA. <br> Cercles amb marges negres: embassaments de la CHE.</div>
   <div class="map" id="map" />
 </div>
 

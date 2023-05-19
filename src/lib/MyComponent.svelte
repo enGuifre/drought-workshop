@@ -48,7 +48,7 @@
       dispatchEvent(event);
     }
         
-      }>Compare satellite images</button>
+      }>Compareu imatges per satèl·lit</button>
     
     {/if}
     
