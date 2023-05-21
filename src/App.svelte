@@ -5,18 +5,19 @@
   import Map from "./lib/Map.svelte";
 /*   import Map_compare from "./lib/Map_compare.svelte";
  */
-  //import api_data_backup from "./lib/data/api_data_backup.json";
+  import api_data from "./data/fsensors.json";
   import { onMount } from 'svelte';
   let w;
-  let api_data;
+  //let api_data;
  
-onMount(async () => {
+/*onMount(async () => {
   const response = await fetch('http://aca-web.gencat.cat/sdim2/apirest/data/EMBASSAMENT-EST');
   let f = await response.json();
+  console.log(f.sensors);
   api_data=f.sensors;
   
 
-})
+})*/
 
 let map_compare;
 let currentInfo;
