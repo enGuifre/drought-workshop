@@ -2,22 +2,22 @@
   
   /* import MapSection from "./lib/MapSection.svelte"; */
   /* import { api } from '../services/api.js'; */
-/*   import Map from "./lib/Map.svelte";
+  import Map from "./lib/Map.svelte";
   import Map_compare from "./lib/Map_compare.svelte";
- */
+
   //import api_data_backup from "./lib/data/api_data_backup.json";
   import { onMount } from 'svelte';
   let w;
   let api_data;
  
-/* onMount(async () => {
+onMount(async () => {
   const response = await fetch('http://aca-web.gencat.cat/sdim2/apirest/data/EMBASSAMENT-EST');
   let f = await response.json();
   api_data=f.sensors;
   
 
 })
- */
+
 let map_compare;
 let currentInfo;
 let prevYearInfo;
@@ -55,7 +55,7 @@ let prevYearInfo;
 
   <section>
 Hello world
-<!--     {#if !map_compare || map_compare==false}
+    {#if !map_compare || map_compare==false}
         {#if api_data}
           <Map {api_data}/> 
         
@@ -66,7 +66,7 @@ Hello world
       {:else}
       <Map_compare {map_compare} {currentInfo} {prevYearInfo}/>  
     {/if}
- -->
+
     
 
     
