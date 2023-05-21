@@ -3,8 +3,8 @@
   /* import MapSection from "./lib/MapSection.svelte"; */
   /* import { api } from '../services/api.js'; */
   import Map from "./lib/Map.svelte";
-  import Map_compare from "./lib/Map_compare.svelte";
-
+/*   import Map_compare from "./lib/Map_compare.svelte";
+ */
   //import api_data_backup from "./lib/data/api_data_backup.json";
   import { onMount } from 'svelte';
   let w;
@@ -28,7 +28,7 @@ let prevYearInfo;
   },5000) */
 
   //the event triggered from mycomponent.svelte 'Satellite' button
-  window.addEventListener('updateCompare', (event) => {
+/*   window.addEventListener('updateCompare', (event) => {
 
     map_compare = event.detail.map_compare;
     console.warn('updateCompare',event)
@@ -47,14 +47,13 @@ let prevYearInfo;
     console.warn('closeSatelliteEvent',map_compare)
 });
   console.warn(map_compare)
-
+ */
 // setTimeout(function() {
 //   map_compare=true;
 // }, 5000);
 </script>
 
   <section>
-Hello world
     {#if !map_compare || map_compare==false}
         {#if api_data}
           <Map {api_data}/> 
@@ -64,8 +63,8 @@ Hello world
           {/if}
 
       {:else}
-      <Map_compare {map_compare} {currentInfo} {prevYearInfo}/>  
-    {/if}
+<!--       <Map_compare {map_compare} {currentInfo} {prevYearInfo}/>  
+ -->    {/if}
 
     
 
