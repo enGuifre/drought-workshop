@@ -10,14 +10,14 @@
   let w;
   //let api_data;
  
-onMount(async () => {
+/*onMount(async () => {
   const response = await fetch('http://aca-web.gencat.cat/sdim2/apirest/data/EMBASSAMENT-EST');
   let f = await response.json();
   console.log(f.sensors);
   api_data=f.sensors;
   
 
-})
+})*/
 
 let map_compare;
 let currentInfo;
