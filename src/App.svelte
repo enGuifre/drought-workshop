@@ -185,6 +185,7 @@ let prevYearInfo;
   :global(.scale_container line) {
     opacity: 0;
   }
+ 
 :global(.map-overlay-close svg)
 {
   

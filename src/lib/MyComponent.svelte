@@ -6,16 +6,10 @@
 	export let points_data;
     export let prevYearData;
     console.log(data)
-    console.log(prevYearData)
+    
     
     let delTime=20;
     let delay=0;
-    
-    // data.map(d=>d.delTime=delay+10)
-    
-    // let this_=data;
-    //.slice(0,6)
-    
     
     </script>
      {#if data && data.length>0}
