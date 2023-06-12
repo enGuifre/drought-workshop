@@ -29,7 +29,6 @@
   let map;
   let icgc_sat;
   let current_code = null;
-
   let showOverlay = false;
   let clicked_code = null;
 
@@ -193,18 +192,10 @@ $: month_historical_data = selected_info ? historical.filter((d, i) => {
    
   }):'no month data??';
 
- /* 
-  Blue #4E8AC8   -  60% to 100% capacity
-Green #60BB46   - 40% to 59.9% capacity
-Yellow #F1EA1E    - 25% to 39.9% capacity
-Orange #F58523     - 16% to 24.9% capacity
-Red #F15546    - 0% to 15.9% capacity
 
-  */
   let thresholdScale = {
-    domain: [16, 25, 40, 60,100],
-    
-    range: ['#2C3696', '#3846D6', '#616EFF', '#A3B8FF','#FFFFFF']
+    domain: [16, 25, 40, 60,100],    
+    range: ['#91E5F6', '#84D2F6', '#59A5D8', '#386FA4','#133C55']
 }; // Set the colors for each threshold
 
 console.warn(thresholdScale)
@@ -335,11 +326,7 @@ function satellite() {
               }
           });
 
-          let thresholdScale = {
-              domain: [16, 25, 40, 60,100],
-              //range:['#CCDFFF', '#A3B8FF', '#616EFF', '#3846D6','#2C3696']
-              range: ['#2C3696', '#3846D6', '#616EFF', '#A3B8FF','#FFFFFF']
-          };
+       
           /* d.properties.volume=data.vol_hm3;
             d.properties.perc_volume=data.perc_volume; */
           let non_aca_expression = [
@@ -458,6 +445,8 @@ function satellite() {
           if (features && features.length > 0) {
               let info = features[0].properties;
               console.log(info)
+              console.warn(filtered_reservoirs_not_aca_data)
+              
               //many features don't have data for every day"! lets search closest one
               let f = filtered_reservoirs_not_aca_data.filter((d, i) => {
 
@@ -473,34 +462,21 @@ function satellite() {
 
 
               if (data.currentData) {
-                  data.prevData.data = data.prevData.data || {
-                      vol_hm3: 10,
-                      perc_volume: 30
-                  }
-                  console.info(data.prevData)
-                  /*   
-                  currentData
-                  {
-                        "name": "Rialb",
-                        "cap_hm3": 403552,
-                        "Codi_ACA": "E0240",
-                        "Dia": "30/4/2023",
-                        "vol_hm3": "23,24",
-                        "perc_volume": "5,76"
-                    }
-                    */
+
+               
                   popup.setHTML(`
               <div class="title">${data.currentData.name}</div><div class="close_popup">x</div>
                <div>Capacitat màxima <span style="color:#00bcff">${info.capacity} hm³</span></div> 
-              <div style='color:gold'>${data.currentData.Dia}</div>
+              
               <div class='non_aca_current_perc_bar'></div>
 
-              <div>${data.currentData.vol_hm3} hm³</div></hr>
-              <div class="prevDate">${data.prevData.Dia}</div>
+              
+              
               <div class='prev_perc_bar'>
                 <div class='nonaca_prev_perc_bar_class'></div>
+                
               </div>
-              <div>${data.prevData.data.vol_hm3} hm³</div></hr>
+              </hr>
               
               <div class='see_satellite_container'></div>
               
@@ -525,42 +501,48 @@ function satellite() {
                   current_code = null;
                   jQuery(".maplibregl-popup").hide();
               })
-
+              console.log(data.prevData)
 
                   if (data.prevData.perc_volume) {
-
+                    
                       let element = document.getElementsByClassName('nonaca_prev_perc_bar_class')[0]
 
                       let myComponent = new MyComponent({
                           target: element,
                           props: {
                               data: [{
+                                type:'prevData',
                                   perc_volume: data.prevData.perc_volume,
-                                  dia: data.prevData.Dia
+                                  dia: data.prevData.Dia,
+                                  vol_hm3:data.prevData.vol_hm3
                               }]
                           }
                       });
-
+                      
 
                   }
 
                   if (data.currentData.perc_volume) {
 
-
+                    
                       let element = document.getElementsByClassName('non_aca_current_perc_bar')[0]
-
+                      
                       let myComponent = new MyComponent({
                           target: element,
                           props: {
                               data: [{
+                                type:'currentData',
                                   perc_volume: data.currentData.perc_volume,
-                                  dia: data.currentData.Dia
+                                  dia: data.currentData.Dia,
+                                  vol_hm3:data.currentData.vol_hm3
                               }]
                           }
                       });
                       let currentInfo = features[0].properties;
                       currentInfo.percent = data.currentData.perc_volume;
 
+                      element= document.getElementsByClassName('see_satellite')[0];
+                   
                       let satelliteBtn = new MyComponent({
                           target: element,
                           props: {
@@ -572,13 +554,9 @@ function satellite() {
                                   perc_volume: data.prevData.perc_volume,
                                   day: data.prevData.Dia
                               }
-
-            
-
-
-
                           }
                       });
+                    
                   }
 
               }
@@ -597,11 +575,14 @@ function satellite() {
           let selected_info_popup;
           var features = map.queryRenderedFeatures(e.point);
 
-          /*
-          , {
-                        layers: ['dams_pol_layer','dams_point_layer']
-                    });
-                    */
+          selected_info = features[0].properties;
+
+          //search same month we are but for last years
+          // $: historical_data fails...
+          historical_data=searchRecord(historical.filter((d, i) => {
+                            return String(d.codi) == String(selected_info.CODI_ACA) && d.dia.split('/')[2] == year - 1;
+                          }), String(format_date(day) + '/' + format_date(month) + '/') + String(year - 1));
+        
 
           if (features && features.length > 0) {
               selected_info = features[0].properties;
@@ -611,11 +592,8 @@ function satellite() {
               if (current_code && selected_info.CODI_ACA == current_code) {
                   return false;
               } else {
-                  selected_info = features[0].properties;
-                  /* selected_data=features[0].properties; */
-                  current_code = selected_info.CODI_ACA;
+                current_code = selected_info.CODI_ACA;
                   selected_info_popup = features[0].properties;
-                  console.log(historical_data)
               }
 
           } else {
@@ -626,72 +604,34 @@ function satellite() {
 
               return false;
           }
-          /* 
-                if (features[0].layer.type=='fill')
-                {
-                  
-                  selected_info_popup=dams_centroid.features.filter(d=>d.properties.CODI_ACA==selected_info_popup.CODI_ACA)[0].properties;
-                  
-                }
-                let date = new Date();
-
-            let day = date.getDate();
-            let month = date.getMonth() + 1;
-            let year = date.getFullYear();
-                let currentDate = `${day}/${month}/${year}`;
-                let prevDate=`${day}/${month}/${year-1}`; */
-          //  var historical_data=historical.filter(d=>d.dia==prevDate)[0];
-
-
-          /*
-          nivell_absolut: 787.11
-          perc_volume: 46.5
-          volume: 37.23
-          */
-
-          //data.prevData=.searchRecord(filtered_reservoirs_not_aca_data,'03/05/2022');
-
-          console.log(historical_data)
-
-
-          //historical_data=searchRecord(historical_data,'02/05/2022') || null;
-          if (!historical_data) {
-              console.log(historical_data)
-
-          }
-
-          //  .searchRecord(filtered_reservoirs_not_aca_data,'03/05/2022');
+         
           console.warn(selected_info, historical_data)
 
           if (historical_data) {
               jQuery(".maplibregl-popup").show();
-              console.log(historical_data, selected_info)
-              //even if no votes, we popup the name of municipality
+              
+              
               popup.setHTML(`
               <div class="title">${selected_info.NAME}</div><div class="close_popup">x</div>
               <div>Capacitat màxima <span style="color:#00bcff">${selected_info.capacity}</span> hm³</div>
-              <div style='color:gold'>${currentDate}</div>
+              
               <div class='current_perc_bar'></div>
               </hr>
-              <div>${selected_info.volume} hm³</div>
-              <div class="prevDate">${historical_data.dia}</div>
+              
+              
               <div class='prev_perc_bar'>
                 <div class='prev_perc_bar_class'></div>
                   </div>
-              <div>${historical_data.volume} hm³</div>
+              
               <div class='see_satellite_container'></div>
               <div class='lineChart_container'></div>
 
               
             `);
-              //<div>nivell_absolut: "+historical_data.nivell_absolut+"</div>"
-              //<div>perc_volume: "+historical_data.perc_volume+"</div>
-
-
-              //  var latlng = e.lngLat;
+              
               let coords = features[0].geometry.coordinates;
               let latlng = new LngLat(coords[0], coords[1])
-              console.info(latlng)
+              
               popup.addTo(map);
               popup.setLngLat(latlng);
 
@@ -705,52 +645,37 @@ function satellite() {
               element.classList.add('current_perc_bar_class');
               var f = document.getElementsByClassName('current_perc_bar')[0]
               f.appendChild(element);
-              console.warn(selected_info)
+              
 
               let myComponent = new MyComponent({
                   target: element,
                   props: {
                       data: [{
+                          type:'currentData',
                           perc_volume: selected_info.percent,
-                          dia: currentDate
+                          dia: currentDate,
+                          vol_hm3:selected_info.volume
                       }]
 
                   }
               });
 
 
-
-
-              /* let myComponent = new MyComponent({ target: element,
-                          props: {
-                            month_historical_data: [ {
-                              perc_volume:selected_info_popup.percent,
-                              dia:currentDate
-                              
-                            },...month_historical_data]
-                          
-                            
-                  } });  */
-
-              /*    var element = document.createElement("div");
-                element.classList.add('prev_perc_bar_class');
-                var f=document.getElementsByClassName('prev_perc_bar')[0]
-                f.appendChild(element);  */
-              //historical_data=searchRecord(historical_data,'02/05/2022') || null;
-
               element = document.getElementsByClassName('prev_perc_bar_class')[0]
-              console.log(historical_data.perc_volume)
+              
               myComponent = new MyComponent({
                   target: element,
                   props: {
                       data: [{
+                        type:'prevData',
                           perc_volume: historical_data.perc_volume,
-                          dia: historical_data.dia
+                          dia: historical_data.dia,
+                          vol_hm3:historical_data.volume
                       }]
                   }
               });
 
-              var element = document.createElement("div");
+              element = document.createElement("div");
               element.classList.add('chart');
               var f = document.getElementsByClassName('lineChart_container')[0]
               f.appendChild(element);
@@ -777,7 +702,7 @@ function satellite() {
               var f = document.getElementsByClassName('see_satellite_container')[0]
               f.appendChild(element);
 
-              console.info(selected_info, historical_data)
+              
 
 
               let satelliteBtn = new MyComponent({
@@ -793,22 +718,7 @@ function satellite() {
                   }
               });
 
-              /*  
-          
-                let myComponent = new MyComponent({ target: element,
-                  props: {
-            name: 'John',
-            age: 30
-          } }); 
-        */
-
-              /* console.warn([ {
-                            perc_volume:selected_info_popup.percent,
-                            dia:currentDate
-                            
-                          },...month_historical_data]) */
-
-
+       
 
           }
 
@@ -846,13 +756,38 @@ function satellite() {
   
   </div>
   <div class="circles_info">Mida dels cercles proporcional a la capacitat màxima.<br>Cercles amb marges blancs: embassaments de l'ACA. <br> Cercles amb marges negres: embassaments de la CHE.</div>
+  <div class="main-map-overlay center"><span>Nivell d'aigua als embassaments catalans</span></div>
   <div class="map" id="map" />
 </div>
 
 
 
 <style>
+  .main-map-overlay.center span 
+  {
+    top:1rem;
+    position: relative;
+    padding:20px;
+    background-color: rgb(67, 67, 197);
+    color:white;
+  }
+   .main-map-overlay.center{
+        text-transform: uppercase;
+        color:black;
+    position: absolute;
+    
+    z-index: 9999999;
+    /* background: black;
+    border: 1px solid white; */
+    
 
+    padding: 10px;
+    left: 0; 
+  right: 0; 
+  margin-left: auto; 
+  margin-right: auto; 
+  width: 100%; /* Need a specific value to work */
+  }
 
 .circles_info {
     position: absolute;

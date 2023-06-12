@@ -14,37 +14,50 @@
    let beforeMap;
    let icgc_sat_prev;
    let selectedSatelliteYear;
-   let date = new Date();
-export let map_compare;
-export let currentInfo;
-export let prevYearInfo;
-let coords;
-let afterMap;
-if (currentInfo)
-{
-  console.info(currentInfo)
-  console.info(dams_bbox.features)
-  
-   let bbox_pol=dams_bbox.features.filter(d=>String(d.properties.CODI_ACA)==String(currentInfo.CODI_ACA))[0];
-   
-   coords=bbox_pol.geometry.coordinates[0][0];
-  
- 
-}
-let day = date.getDate();
-let month = (date.getMonth())<10?`0${date.getMonth()}`:date.getMonth();
 
-let year = date.getFullYear();
+   let date = new Date();
+    export let map_compare;
+    export let currentInfo;
+    export let prevYearInfo;
+    let coords;
+    let afterMap;
+    let prevYearInfo_label_classes;
+let currentYearInfo_label_classes;
+
+    if (currentInfo)
+    {
+      console.info(currentInfo)
+      console.info(dams_bbox.features)
+      
+      let bbox_pol=dams_bbox.features.filter(d=>String(d.properties.CODI_ACA)==String(currentInfo.CODI_ACA))[0];
+      
+      coords=bbox_pol.geometry.coordinates[0][0];
+      
+    
+    }
+    let day = date.getDate();
+    let month = (date.getMonth())<10?`0${date.getMonth()}`:date.getMonth();
+
+    let prev_month;
+    //we try to make sure that there is some data for the previous month... otherwise we go back one more month
+    if (+day<15)
+     {
+      
+      prev_month=`0${+date.getMonth()-1}`
+     }
+     else
+     {
+      prev_month=month;
+     }
+    
+    let year = date.getFullYear();
     let currentDate = `${day}/${month}/${year}`;
     let prevDate=`${day}/${month}/${year-1}`;
 
-   $:{
+    $:{
       if (selectedSatelliteYear) {
-        //alert(selectedSatelliteYear)
-          console.log(`https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&WIDTH=126&HEIGHT=126&BBOX={bbox-epsg-3857}&TIME=${selectedSatelliteYear}-${month}&dt=${Date.now()}`)
-              // Set the tile url to a cache-busting url (to circumvent browser caching behaviour):
-              beforeMap.getSource('icgc_sat_source_prev').tiles = [ `https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&WIDTH=126&HEIGHT=126&BBOX={bbox-epsg-3857}&TIME=${selectedSatelliteYear}-${month}`]
-              //&dt=${Date.now()}`]
+        // Set the tile url to a cache-busting url (to circumvent browser caching behaviour):sen2irc_202304
+        beforeMap.getSource('icgc_sat_source_prev').tiles = [ `https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc_${selectedSatelliteYear}${month}&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&WIDTH=126&HEIGHT=126&BBOX={bbox-epsg-3857}`]
 
           // Remove the tiles for a particular source
           beforeMap.style.sourceCaches['icgc_sat_source_prev'].clearTiles()
@@ -80,8 +93,16 @@ let year = date.getFullYear();
 
         //sau 
         // 2.337, "xmax": 2.415, "y_min": 41.963, "y_max": 42
+        console.log(prevYearInfo)
+      if (+prevYearInfo.perc_volume > 50) 
+        prevYearInfo_label_classes='blue percent';
+      else
+        prevYearInfo_label_classes='red percent';
 
-    
+      if (+currentInfo.perc_volume > 50) 
+      currentYearInfo_label_classes='blue percent'
+              else
+      currentYearInfo_label_classes='red percent'
 
       beforeMap.fitBounds([
      coords[1], // southwestern corner of the bounds
@@ -93,38 +114,35 @@ let year = date.getFullYear();
       afterMap.addSource('icgc_sat_source_now', {
     
     'type': 'raster',
-    'tiles': [
-      
-      'https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=512&HEIGHT=512&TIME=2023-'+(date.getMonth()-2)
+    'tiles': [      
+    `https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc_${year}${prev_month}&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=512&HEIGHT=512`
     ],
     'tileSize': 512,
   
     })
-      beforeMap.addSource('icgc_sat_source_prev', {
-    
+    beforeMap.addSource('icgc_sat_source_prev', {    
     'type': 'raster',
-    'tiles': [
-      
-      'https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=512&HEIGHT=512&TIME=2022-'+month
+    'tiles': [      
+    `https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc_${year-1}${month}&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&BBOX={bbox-epsg-3857}&WIDTH=512&HEIGHT=512`
     ],
     'tileSize': 512,
   
     })
 
-    icgc_sat_prev={
+    icgc_sat_prev=
+    {
+    'id': 'icgc_sat_prev',
 
-'id': 'icgc_sat_prev',
+    'type': 'raster',
+    'source': 'icgc_sat_source_prev',
+    'layout':
+    {
+    visibility: 'none'
+    },
+    'paint': {
 
-'type': 'raster',
-'source': 'icgc_sat_source_prev',
-'layout':
-{
-visibility: 'none'
-},
-'paint': {
-
-}
-}
+    }
+  }
 
     beforeMap.addLayer(icgc_sat_prev);
 
@@ -210,12 +228,13 @@ function destroyComponent() {
     </div>
     <div class="map-overlay center"><div class="title">{currentInfo.NAME}</div>
       <div class="prevYear">
-        <div class="info"><span class="date">{month}-2022</span><span class="percent"> {prevYearInfo.perc_volume}%</span></div>
+        <div class="info"><span class="date">{month}-2022</span><span 
+          class="{prevYearInfo_label_classes}"> {prevYearInfo.perc_volume}%</span></div>
       </div>
 
       <div class="currentYear">
         <!-- we have to define -2 months for current year bc often missing the satellite images -->
-        <div class="info"><span class="date">{String(0)+(date.getMonth()-2)}-{year}</span><span class="percent"> {currentInfo.percent} %</span></div>
+        <div class="info"><span class="date">{prev_month}-{year}</span><span class="{currentYearInfo_label_classes}"> {currentInfo.percent} %</span></div>
         
       </div>
     </div>
@@ -231,7 +250,7 @@ function destroyComponent() {
 <!-- {/if} -->
 
 <style>
-   body {
+    body {
         overflow: hidden;
         color:black;
       }
@@ -252,14 +271,22 @@ function destroyComponent() {
       }
       .info .date
       {
-        font-size: .8rem;
+        color:whitesmoke
       }
       .info .percent
       {
         font-size: 2rem;
-        color: #0d5589;
+        
         margin-left: 10px;
         font-weight: bolder;
+      }
+      .percent.blue
+      {
+        color: #00b4ff;
+      }
+      .percent.red
+      {
+        color: #c34242;
       }
       .info
       {
@@ -270,15 +297,19 @@ function destroyComponent() {
     margin-left: auto;
     margin-right: auto;
     padding: 10px;
+    background: #222121;
+    border: 2px solid gray;
       }
-      .title 
+      .info span 
       {
-        font-size: 2rem;
+        display: block;
       }
+ 
       .map-overlay.center{
         text-transform: uppercase;
         color:black;
     position: absolute;
+    
     z-index: 9999999;
     /* background: black;
     border: 1px solid white; */
@@ -303,6 +334,7 @@ function destroyComponent() {
     width: 50%;
     text-align: center;
   }
+ 
   .map-overlay.prevYear{
     position: absolute;
     z-index: 9999999;
@@ -331,6 +363,7 @@ function destroyComponent() {
       right: 15px;
       top: 2%;
     }
+    
     .map-overlay-close:hover 
     {
       cursor: pointer;
@@ -338,20 +371,23 @@ function destroyComponent() {
   .map-overlay-close {
     position: absolute;
     z-index: 11119999999;
-    padding: 10px;
+    padding: 1px;
     width: 55px;
-    color: #0dbbcc;
+    color: white;
+    background-color: black;
+    border: 2px solid gray;
     font-size: 13px;
     right: 15px;
     top: 2%;
 }
 
 
-
-
-  .map-wrap {
-    /* position: absolute!important; */
+.map-overlay .title
+  {
     
+    color:goldenrod;
+    font-size: 2rem;
+    font-weight: bold;
   }
   .maplibregl-compare .compare-swiper-vertical {
     background-color: #3887be;

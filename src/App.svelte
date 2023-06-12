@@ -8,6 +8,7 @@
   import api_data from "./data/fsensors.json";
   import { onMount } from 'svelte';
   let w;
+  
   //let api_data;
  
 /*onMount(async () => {
