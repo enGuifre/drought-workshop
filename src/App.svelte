@@ -154,7 +154,8 @@ let prevYearInfo;
   }
   :global(.maplibregl-popup-content) 
   {
-    border: 1.5px solid white
+    border: 1.5px solid white;
+    min-width: 250px;
   }
   :global(.mapboxgl-popup-anchor-top .mapboxgl-popup-tip, .maplibregl-popup-anchor-top .maplibregl-popup-tip,
   .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip, .maplibregl-popup-anchor-top-right .maplibregl-popup-tip
@@ -187,6 +188,7 @@ let prevYearInfo;
   :global(.maplibregl-popup) {
     max-width: unset!important;
     width: 300px;
+    z-index: 111111111;
   }
   :global(.maplibregl-popup-content) {
     color: white !important;
@@ -223,4 +225,8 @@ let prevYearInfo;
     right: 10px;
 
   }
+  :global(.mapboxgl-popup-anchor-left .mapboxgl-popup-tip, .maplibregl-popup-anchor-left .maplibregl-popup-tip)
+ {
+  border-right-color: black!important;
+ }
 </style>
