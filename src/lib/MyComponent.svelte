@@ -6,21 +6,36 @@
 	export let points_data;
     export let prevYearData;
     console.log(data)
+
+
+    console.log(prevYearData)
     
     
     let delTime=20;
     let delay=0;
     
+    // data.map(d=>d.delTime=delay+10)
+    
+    // let this_=data;
+    //.slice(0,6)
+   
+    
     </script>
+    
      {#if data && data.length>0}
-        
-                {#each data as {perc_volume, dia}}
+     
+        <div>
+                {#each data as {perc_volume, dia,vol_hm3}}
+                <div style='color:gold'>{dia}</div>
                 <PopupBar {perc_volume} 
                                     {dia}
                                     
                                 
                                     />
+                                    <div>{vol_hm3} hm3</div>
                 {/each}
+        </div>                
+                
         
             
         
@@ -42,7 +57,7 @@
       dispatchEvent(event);
     }
         
-      }>Compare satellite images</button>
+      }>Compareu imatges per satèl·lit</button>
     
     {/if}
     

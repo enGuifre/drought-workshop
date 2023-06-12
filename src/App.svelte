@@ -5,18 +5,20 @@
   import Map from "./lib/Map.svelte";
   import Map_compare from "./lib/Map_compare.svelte";
 
-  //import api_data_backup from "./lib/data/api_data_backup.json";
+  import api_data from "./data/fsensors.json";
   import { onMount } from 'svelte';
   let w;
-  let api_data;
+  
+  //let api_data;
  
-onMount(async () => {
+/*onMount(async () => {
   const response = await fetch('http://aca-web.gencat.cat/sdim2/apirest/data/EMBASSAMENT-EST');
   let f = await response.json();
+  console.log(f.sensors);
   api_data=f.sensors;
   
 
-})
+})*/
 
 let map_compare;
 let currentInfo;
@@ -28,7 +30,7 @@ let prevYearInfo;
   },5000) */
 
   //the event triggered from mycomponent.svelte 'Satellite' button
-  window.addEventListener('updateCompare', (event) => {
+   window.addEventListener('updateCompare', (event) => {
 
     map_compare = event.detail.map_compare;
     console.warn('updateCompare',event)
@@ -54,27 +56,15 @@ let prevYearInfo;
 </script>
 
   <section>
-
     {#if !map_compare || map_compare==false}
-        {#if api_data}
-          <Map {api_data}/> 
-        
-          {:else}
-          <div>Loading...</div>
-          {/if}
-
+      {#if api_data}
+        <Map {api_data}/> 
       {:else}
+        <div>Loading...</div>
+      {/if}
+    {:else}
       <Map_compare {map_compare} {currentInfo} {prevYearInfo}/>  
     {/if}
-
-    
-
-    
-  
-  
-  
- 
-    
   </section>
   
 
@@ -185,7 +175,6 @@ let prevYearInfo;
   :global(.scale_container line) {
     opacity: 0;
   }
- 
 :global(.map-overlay-close svg)
 {
   
