@@ -7,17 +7,44 @@
 
   import api_data from "./data/fsensors.json";
   import { onMount } from 'svelte';
+  import csvtojson from 'csvtojson';
   let w;
   
   //let api_data;
  
-/*onMount(async () => {
-  const response = await fetch('http://aca-web.gencat.cat/sdim2/apirest/data/EMBASSAMENT-EST');
-  let f = await response.json();
-  console.log(f.sensors);
-  api_data=f.sensors;
-  
 
+const spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/1EwaCqG-7G2x0m7cwBA-xIaA7unK5LZY9uguKXRA0OAE/edit#gid=0';
+let data = [];
+let loading = true;
+
+async function fetchSpreadsheetData() {
+  try {
+    const response = await fetch(spreadsheetUrl);
+    const csvData = await response.text();
+    data = await csvtojson().fromString(csvData);
+    console.log("Google sheet 2!")
+    console.log(data);
+
+  } catch (error) {
+    console.error('Error fetching spreadsheet data:', error);
+  } finally {
+    loading = false;
+  }
+}
+
+onMount(fetchSpreadsheetData);
+
+
+/*onMount(async () => {
+  //const response = await fetch('http://aca-web.gencat.cat/sdim2/apirest/data/EMBASSAMENT-EST');
+  const response = await fetch('https://excel-db.herokuapp.com/r/1EwaCqG-7G2x0m7cwBA-xIaA7unK5LZY9uguKXRA0OAE');
+  //const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSHq6_XBcU4xvIuiZ3Ynwf564c3oH_-BrBf2Cof3CuH8DSZaegiAWOz5mhLN1RZSVCPse1VWWlk-r9w/pubhtml');
+  //https://docs.google.com/spreadsheets/d/1J1SwO8h0BSRZ1iv-QS1L00nU4fb9Wv2eKNdIT0aBfJo/edit#gid=0
+  //let f = await response.json();
+
+  console.log("Google sheet!")
+  console.log(response);
+  //api_data=f.sensors;
 })*/
 
 let map_compare;

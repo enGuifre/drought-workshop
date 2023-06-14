@@ -24,7 +24,7 @@
   export let api_data;
   let map_compare;
 
-  console.info(reservoirs_not_aca_data);
+  //console.info(reservoirs_not_aca_data);
 
   let map;
   let icgc_sat;
@@ -43,7 +43,7 @@
     s++;
     const record = jsonData.find((item) => item.dia === dateString);
     if (record) {
-      console.log(record)
+      //console.log(record)
       return record;
     }
     const prevDate = getPreviousDate(dateString);
@@ -115,7 +115,7 @@ not_aca_centroids.map((d) => {
     return d2.Codi_ACA == d.properties.CODI_ACA;
   })[0];
   if (data) {
-    console.warn(data.cap_hm3,isNaN(data.cap_hm3))
+    //console.warn(data.cap_hm3,isNaN(data.cap_hm3))
     d.properties.volume = data.vol_hm3;
     //d.properties.capacity = data.cap_hm3/1000;
     if (isNaN(data.cap_hm3))
@@ -169,7 +169,7 @@ let min_max_volume = extent(visible_centroids, (d) => d.properties.volume);
 let min_max_capacity = extent(visible_centroids, (d) => d.properties.capacity);
 
 let all_min_max_capacity=extent([...not_aca_min_max_capacity,...min_max_capacity])
-console.warn(all_min_max_capacity);
+//console.warn(all_min_max_capacity);
 //let selected_info;
 $: selected_info = selected_info ? selected_info : null;
 //let historical_data = null;
@@ -206,7 +206,7 @@ Red #F15546    - 0% to 15.9% capacity
     range: ['#91E5F6', '#84D2F6', '#59A5D8', '#386FA4','#133C55']
 }; // Set the colors for each threshold
 
-console.warn(thresholdScale)
+//console.warn(thresholdScale)
 
 
 function satellite() {
@@ -222,7 +222,7 @@ function satellite() {
 
     if (!map.getLayer('icgc_sat')) {
         map.addLayer(icgc_sat, 'dams_point_layer');
-        console.info(map.getStyle().layers)
+        //console.info(map.getStyle().layers)
 
         map.getStyle().layers.forEach((layer) => {
             if (layer.id == 'icgc_sat') {
@@ -261,7 +261,7 @@ function satellite() {
 
 
       map.on("load", function() {
-        console.log(map.getBounds())
+        //console.log(map.getBounds())
           map.addControl(new NavigationControl(), "top-right");
 
           map.addSource('icgc_sat_source', {
@@ -441,7 +441,7 @@ function satellite() {
 
           if (features && features.length > 0) {
               let info = features[0].properties;
-              console.log(info)
+              //console.log(info)
               
               let f = filtered_reservoirs_not_aca_data.filter((d, i) => {
 
@@ -454,7 +454,7 @@ function satellite() {
 
               data.prevData = searchRecord(f, '03/05/2022');
 
-              console.log(data)
+              //console.log(data)
 
 
               if (data.currentData) {
@@ -594,11 +594,11 @@ function satellite() {
               }
 
               
-              console.log(historical_data)
+              //console.log(historical_data)
 
           
                   jQuery(".maplibregl-popup").show();
-                  console.log(historical_data, selected_info)
+                  //console.log(historical_data, selected_info)
                   //even if no votes, we popup the name of municipality
                   popup.setHTML(`
               <div class="title">${selected_info.NAME}</div><div class="close_popup">x</div>
@@ -619,7 +619,7 @@ function satellite() {
                   //  var latlng = e.lngLat;
                   let coords = features[0].geometry.coordinates;
                   let latlng = new LngLat(coords[0], coords[1])
-                  console.info(latlng)
+                  //console.info(latlng)
                   popup.addTo(map);
                   popup.setLngLat(latlng);
 
@@ -633,7 +633,7 @@ function satellite() {
                   element.classList.add('current_perc_bar_class');
                   var f = document.getElementsByClassName('current_perc_bar')[0]
                   f.appendChild(element);
-                  console.warn(selected_info)
+                  //console.warn(selected_info)
 
                   let myComponent = new MyComponent({
                   target: element,
@@ -648,9 +648,9 @@ function satellite() {
               });
 
 
-                  console.warn(historical_data)
+                  //console.warn(historical_data)
                   element = document.getElementsByClassName('prev_perc_bar_class')[0]
-                  console.log(historical_data.perc_volume,historical_data.dia)
+                  //console.log(historical_data.perc_volume,historical_data.dia)
 
                   myComponent = new MyComponent({
                   target: element,
@@ -670,7 +670,7 @@ function satellite() {
                   f.appendChild(element);
 
                   
-                  console.warn(month_historical_data)
+                  //console.warn(month_historical_data)
 
                   myComponent = new MyComponent({
                       target: element,
@@ -691,7 +691,7 @@ function satellite() {
                   var f = document.getElementsByClassName('see_satellite_container')[0]
                   f.appendChild(element);
 
-                  console.info(selected_info, historical_data)
+                  //console.info(selected_info, historical_data)
 
 
                   let satelliteBtn = new MyComponent({
