@@ -2,7 +2,8 @@
   import { onMount, onDestroy } from "svelte";
   import MdClear from 'svelte-icons/md/MdClear.svelte'  
   import { Map, NavigationControl, Popup, LngLat } from "maplibre-gl";
-  import * as Compare from "@maplibre/maplibre-gl-compare";
+  //import * as Compare from "@maplibre/maplibre-gl-compare";
+import Compare from "@maplibre/maplibre-gl-compare";
   import "maplibre-gl/dist/maplibre-gl.css";
   
   import jQuery from "jquery";
