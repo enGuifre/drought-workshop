@@ -5,25 +5,34 @@
   import Map from "./lib/Map.svelte";
   import Map_compare from "./lib/Map_compare.svelte";
 
-  import api_data from "./data/fsensors.json";
+//  import api_data from "./data/fsensors.json";
   import { onMount } from 'svelte';
   import csvtojson from 'csvtojson';
+  import {csv} from 'd3-fetch'
+  import {groups} from 'd3-array'
   let w;
   
-  //let api_data;
- 
-
-const spreadsheetUrl = 'https://docs.google.com/spreadsheets/d/1EwaCqG-7G2x0m7cwBA-xIaA7unK5LZY9uguKXRA0OAE/edit#gid=0';
-let data = [];
-let loading = true;
+  let api_data;
+  
+  let loading = true;
 
 async function fetchSpreadsheetData() {
   try {
-    const response = await fetch(spreadsheetUrl);
-    const csvData = await response.text();
-    data = await csvtojson().fromString(csvData);
-    console.log("Google sheet 2!")
-    console.log(data);
+    const base = "https://docs.google.com";
+    const id = '1J1SwO8h0BSRZ1iv-QS1L00nU4fb9Wv2eKNdIT0aBfJo';
+    const gid = '0'
+    const file = `spreadsheets/u/1/d/${id}/export?format=csv&id=${id}&gid=${gid}`
+    const url = `${base}/${file}`;
+    let data = await csv(url); 
+    let adaptedData = data.map(d => ({
+            sensor: d.Sensor,
+            value: d.Value,
+            timestamp: d.Timestamp
+          }))
+          api_data = groups(adaptedData, d => d.sensor).map(d => ({
+            sensor : d[0],
+            observations : [{...d[1][d[1].length-1], location :''}]
+          }))
 
   } catch (error) {
     console.error('Error fetching spreadsheet data:', error);
@@ -33,19 +42,6 @@ async function fetchSpreadsheetData() {
 }
 
 onMount(fetchSpreadsheetData);
-
-
-/*onMount(async () => {
-  //const response = await fetch('http://aca-web.gencat.cat/sdim2/apirest/data/EMBASSAMENT-EST');
-  const response = await fetch('https://excel-db.herokuapp.com/r/1EwaCqG-7G2x0m7cwBA-xIaA7unK5LZY9uguKXRA0OAE');
-  //const response = await fetch('https://docs.google.com/spreadsheets/d/e/2PACX-1vSHq6_XBcU4xvIuiZ3Ynwf564c3oH_-BrBf2Cof3CuH8DSZaegiAWOz5mhLN1RZSVCPse1VWWlk-r9w/pubhtml');
-  //https://docs.google.com/spreadsheets/d/1J1SwO8h0BSRZ1iv-QS1L00nU4fb9Wv2eKNdIT0aBfJo/edit#gid=0
-  //let f = await response.json();
-
-  console.log("Google sheet!")
-  console.log(response);
-  //api_data=f.sensors;
-})*/
 
 let map_compare;
 let currentInfo;
