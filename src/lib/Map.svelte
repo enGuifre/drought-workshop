@@ -562,11 +562,8 @@ function satellite() {
           }
       })
 
-
-
-      map.on("mouseenter", 'dams_point_layer', function(e) {
-
-
+      function mapEvent(e)
+        {
           let selected_info_popup;
           var features = map.queryRenderedFeatures(e.point);
 
@@ -710,10 +707,19 @@ function satellite() {
 
           } 
 
-         
+        }     
 
+      
+        map.on("click", 'dams_point_layer', function(e) {
+
+mapEvent(e);
+});
+
+      map.on("mouseenter", 'dams_point_layer', function(e) {
+
+        mapEvent(e);
       });
-
+       
 
   });
 
