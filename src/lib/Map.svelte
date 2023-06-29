@@ -571,12 +571,12 @@ function satellite() {
           
                     selected_info = features[0].properties;
                     console.log(e)      
-
+          console.warn(selected_info)
                    
                     historical_data=searchRecord(historical.filter((d, i) => {
                             return String(d.codi) == String(selected_info.CODI_ACA) && d.dia.split('/')[2] == year - 1;
                           }), String(format_date(day) + '/' + format_date(month) + '/') + String(year - 1))
-                        
+                 console.log(historical_data)       
       
           if (features && features.length > 0) {
 
@@ -599,111 +599,117 @@ function satellite() {
                   //console.log(historical_data, selected_info)
                   //even if no votes, we popup the name of municipality
                   popup.setHTML(`
-              <div class="title">${selected_info.NAME}</div><div class="close_popup">x</div>
-              <div>Capacitat màxima <span style="color:#00bcff">${selected_info.capacity}</span> hm³</div>
-              
-              <div class='current_perc_bar'></div>
-              </hr>
-              <div class='prev_perc_bar'>
-                <div class='prev_perc_bar_class'></div>
-                  </div>
+                  <div class="title">${selected_info.NAME}</div><div class="close_popup">x</div>
+                  <div>Capacitat màxima <span style="color:#00bcff">${selected_info.capacity}</span> hm³</div>
                   
-                  <div class='see_satellite_container'></div>
-                  <div class='lineChart_container'></div>
+                  <div class='current_perc_bar'></div>
+                  </hr>
+                  <div class='prev_perc_bar'>
+                    <div class='prev_perc_bar_class'></div>
+                      </div>
+                      
+                      <div class='see_satellite_container'></div>
+                      <div class='lineChart_container'></div>
 
-                  
-                `);
+                      
+                    `);
               
                   //  var latlng = e.lngLat;
                   let coords = features[0].geometry.coordinates;
                   let latlng = new LngLat(coords[0], coords[1])
                   //console.info(latlng)
-                  popup.addTo(map);
-                  popup.setLngLat(latlng);
-
-                  //how in svelte... create new component... complicated
-                  jQuery('.close_popup').click(function() {
-                      current_code = null;
-                      jQuery(".maplibregl-popup").hide();
-                  })
-
-                  var element = document.createElement("div");
-                  element.classList.add('current_perc_bar_class');
-                  var f = document.getElementsByClassName('current_perc_bar')[0]
-                  f.appendChild(element);
-                  //console.warn(selected_info)
-
-                  let myComponent = new MyComponent({
-                  target: element,
-                  props: {
-                      data: [{
-                          type:'currentData',
-                          perc_volume: selected_info.percent,
-                          dia: currentDate,
-                          vol_hm3:selected_info.volume
-                      }]
-                  }
-              });
-
-
-                  //console.warn(historical_data)
-                  element = document.getElementsByClassName('prev_perc_bar_class')[0]
-                  //console.log(historical_data.perc_volume,historical_data.dia)
-
-                  myComponent = new MyComponent({
-                  target: element,
-                  props: {
-                      data: [{
-                        type:'prevData',
-                          perc_volume: historical_data.perc_volume,
-                          dia: historical_data.dia,
-                          vol_hm3:historical_data.volume
-                      }]
-                  }
-              });
-
-                  var element = document.createElement("div");
-                  element.classList.add('chart');
-                  var f = document.getElementsByClassName('lineChart_container')[0]
-                  f.appendChild(element);
+                  
+                  setTimeout(function()
+                  {
 
                   
-                  //console.warn(month_historical_data)
+                      popup.addTo(map);
+                      popup.setLngLat(latlng);
 
-                  myComponent = new MyComponent({
+                      //how in svelte... create new component... complicated
+                      jQuery('.close_popup').click(function() {
+                          current_code = null;
+                          jQuery(".maplibregl-popup").hide();
+                      })
+
+                      var element = document.createElement("div");
+                      element.classList.add('current_perc_bar_class');
+                      var f = document.getElementsByClassName('current_perc_bar')[0]
+                      f.appendChild(element);
+                      //console.warn(selected_info)
+
+                      let myComponent = new MyComponent({
                       target: element,
-                      props: {
-                          points_data: {
-                              type: 'point',
+                            props: {
+                                data: [{
+                                    type:'currentData',
+                                    perc_volume: selected_info.percent,
+                                    dia: currentDate,
+                                    vol_hm3:selected_info.volume
+                                }]
+                            }
+                        });
+
+
+                      //console.warn(historical_data)
+                          element = document.getElementsByClassName('prev_perc_bar_class')[0]
+                          //console.log(historical_data.perc_volume,historical_data.dia)
+
+                          myComponent = new MyComponent({
+                          target: element,
+                          props: {
                               data: [{
-                                  perc_volume: selected_info.percent,
-                                  dia: currentDate
-
-                              }, ...month_historical_data]
+                                type:'prevData',
+                                  perc_volume: historical_data.perc_volume,
+                                  dia: historical_data.dia,
+                                  vol_hm3:historical_data.volume
+                              }]
                           }
-                      }
-                  });
+                      });
 
-                  var element = document.createElement("div");
-                  element.classList.add('see_satellite');
-                  var f = document.getElementsByClassName('see_satellite_container')[0]
-                  f.appendChild(element);
+                      var element = document.createElement("div");
+                      element.classList.add('chart');
+                      var f = document.getElementsByClassName('lineChart_container')[0]
+                      f.appendChild(element);
 
-                  //console.info(selected_info, historical_data)
+                      
+                      //console.warn(month_historical_data)
+
+                      myComponent = new MyComponent({
+                          target: element,
+                          props: {
+                              points_data: {
+                                  type: 'point',
+                                  data: [{
+                                      perc_volume: selected_info.percent,
+                                      dia: currentDate
+
+                                  }, ...month_historical_data]
+                              }
+                          }
+                      });
+
+                      var element = document.createElement("div");
+                      element.classList.add('see_satellite');
+                      var f = document.getElementsByClassName('see_satellite_container')[0]
+                      f.appendChild(element);
+
+                      //console.info(selected_info, historical_data)
 
 
-                  let satelliteBtn = new MyComponent({
-                      target: element,
-                      props: {
-                          //current situation
-                          data: selected_info,
-                          //prev year situaton
-                          prevYearData: historical_data
+                      let satelliteBtn = new MyComponent({
+                          target: element,
+                          props: {
+                              //current situation
+                              data: selected_info,
+                              //prev year situaton
+                              prevYearData: historical_data
 
 
 
-                      }
-                  });
+                          }
+                      });
+                    },600)
 
 
           } 
@@ -711,10 +717,15 @@ function satellite() {
         }     
 
       
-        map.on("touchstart", 'dams_point_layer', function(e) {
+   /*      map.on("touchstart", 'dams_point_layer', function(e) {
 
 //mapEvent(e);
-});
+}); */
+
+// map.on("mouseover", 'dams_point_layer', function(e) {
+
+// mapEvent(e);
+// });
 
       map.on("click", 'dams_point_layer', function(e) {
 
