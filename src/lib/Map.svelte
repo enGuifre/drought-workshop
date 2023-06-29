@@ -712,7 +712,7 @@ function satellite() {
 
       
         map.on("touchstart", 'dams_point_layer', function(e) {
-
+alert('touchstart')
 mapEvent(e);
 });
 
