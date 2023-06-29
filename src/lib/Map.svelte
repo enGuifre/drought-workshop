@@ -564,7 +564,7 @@ function satellite() {
 
       function mapEvent(e)
         {
-          alert('mapEvent');
+          
           let selected_info_popup;
           var features = map.queryRenderedFeatures(e.point);
 
