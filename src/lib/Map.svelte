@@ -564,12 +564,13 @@ function satellite() {
 
       function mapEvent(e)
         {
+          alert('mapEvent');
           let selected_info_popup;
           var features = map.queryRenderedFeatures(e.point);
 
           
                     selected_info = features[0].properties;
-                    
+                    console.log(e)      
 
                    
                     historical_data=searchRecord(historical.filter((d, i) => {
