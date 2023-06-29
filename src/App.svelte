@@ -248,6 +248,10 @@ let prevYearInfo;
     right: 10px;
 
   }
+  :global(.maplibregl-ctrl-compass.mapboxgl-ctrl-compass)
+{
+  display:none;
+}
   :global(.mapboxgl-popup-anchor-left .mapboxgl-popup-tip, .maplibregl-popup-anchor-left .maplibregl-popup-tip)
  {
   border-right-color: black!important;

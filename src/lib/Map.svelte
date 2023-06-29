@@ -763,18 +763,18 @@ function satellite() {
   
   </div>
   <div class="circles_info">Mida dels cercles proporcional a la capacitat màxima<br>Cercles depenents d'ACA amb la vora blanca</div>
-  <div class="main-map-overlay center"><span>Nivell d'aigua als principals embassaments catalans</span></div>
+  <div class="main-map-overlay center"><div>Nivell d'aigua als principals embassaments catalans</div></div>
   <div class="map" id="map" />
 </div>
 
 
 
 <style>
- .main-map-overlay.center span 
+ .main-map-overlay.center div 
   {
-    top:1rem;
+    top:0.1rem;
     position: relative;
-    padding:20px;
+    padding: 10px;
     background-color: rgb(67, 67, 197);
     color:white;
   }
@@ -791,8 +791,8 @@ function satellite() {
     left: 0; 
   right: 0; 
   margin-left: auto; 
-  margin-right: auto; 
-  width: 100%; /* Need a specific value to work */
+  margin-right: 10%; 
+  width: 85%; /* Need a specific value to work */
   }
 
 .circles_info {
