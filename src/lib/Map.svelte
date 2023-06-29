@@ -571,6 +571,8 @@ function satellite() {
           let selected_info_popup;
           var features = map.queryRenderedFeatures(e.point);
 
+ 
+
           
                     selected_info = features[0].properties;
                     console.log(e)      
@@ -730,7 +732,23 @@ function satellite() {
 // mapEvent(e);
 // });
 
+map.on("click", function(e)
+{
+  const bbox = [
+[e.point.x - 5, e.point.y - 5],
+[e.point.x + 5, e.point.y + 5]
+];
+// Find features intersecting the bounding box.
+const selectedFeatures = map.queryRenderedFeatures(bbox, {
+layers: ['dams_point_layer']
+});
+if (selectedFeatures.length > 0) alert('some clicked' +selectedFeatures.length )
+})
+
+
+
       map.on("click", 'dams_point_layer', function(e) {
+ 
 
         mapEvent(e);
       });
