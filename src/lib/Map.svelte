@@ -712,11 +712,11 @@ function satellite() {
 
       
         map.on("touchstart", 'dams_point_layer', function(e) {
-alert('touchstart')
-mapEvent(e);
+
+//mapEvent(e);
 });
 
-      map.on("mouseenter", 'dams_point_layer', function(e) {
+      map.on("click", 'dams_point_layer', function(e) {
 
         mapEvent(e);
       });
