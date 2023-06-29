@@ -434,7 +434,7 @@ function satellite() {
       });
 
 
-      map.on("mouseenter", 'dams_noaca_point_layer', function(e) {
+      map.on("click", 'dams_noaca_point_layer', function(e) {
 
         
           var features = map.queryRenderedFeatures(e.point);
@@ -480,19 +480,20 @@ function satellite() {
 
                   let coords = features[0].geometry.coordinates;
                   let latlng = new LngLat(coords[0], coords[1])
+                  setTimeout(function()
+                  {
+                      popup.addTo(map);
+                      popup.setLngLat(latlng);
 
-                  popup.addTo(map);
-                  popup.setLngLat(latlng);
+                      var element = document.createElement("div");
+                      element.classList.add('see_satellite');
+                      let f = document.getElementsByClassName('see_satellite_container')[0]
+                      f.appendChild(element);
 
-                  var element = document.createElement("div");
-                  element.classList.add('see_satellite');
-                  let f = document.getElementsByClassName('see_satellite_container')[0]
-                  f.appendChild(element);
-
-                  jQuery('.close_popup').click(function() {
-                  current_code = null;
-                  jQuery(".maplibregl-popup").hide();
-              })
+                      jQuery('.close_popup').click(function() {
+                      current_code = null;
+                      jQuery(".maplibregl-popup").hide();
+                  })
 
 
                   if (data.prevData.perc_volume) {
@@ -553,6 +554,8 @@ function satellite() {
                           }
                       });
                   }
+
+                },500)
 
               }
 
