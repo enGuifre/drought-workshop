@@ -784,7 +784,7 @@ if (selectedFeatures.length > 0) alert('some clicked' +selectedFeatures.length )
   
   </div>
   <div class="circles_info">Mida dels cercles proporcional a la capacitat màxima<br>Cercles depenents d'ACA amb la vora blanca</div>
-  <div class="main-map-overlay center"><div>Nivell d'aigua als principals embassaments catalans</div></div>
+  <div class="main-map-overlay center"><div>Nivell principals embassaments</div></div>
   <div class="map" id="map" />
 </div>
 
