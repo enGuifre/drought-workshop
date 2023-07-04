@@ -614,7 +614,7 @@ function satellite() {
                       </div>
                       
                       <div class='see_satellite_container'></div>
-                      <div class='lineChart_container'></div>
+                      
 
                       
                     `);
@@ -672,7 +672,7 @@ function satellite() {
                           }
                       });
 
-                      var element = document.createElement("div");
+                     /*  var element = document.createElement("div");
                       element.classList.add('chart');
                       var f = document.getElementsByClassName('lineChart_container')[0]
                       f.appendChild(element);
@@ -692,7 +692,7 @@ function satellite() {
                                   }, ...month_historical_data]
                               }
                           }
-                      });
+                      }); */
 
                       var element = document.createElement("div");
                       element.classList.add('see_satellite');
@@ -732,18 +732,7 @@ function satellite() {
 // mapEvent(e);
 // });
 
-map.on("click", function(e)
-{
-  const bbox = [
-[e.point.x - 5, e.point.y - 5],
-[e.point.x + 5, e.point.y + 5]
-];
-// Find features intersecting the bounding box.
-const selectedFeatures = map.queryRenderedFeatures(bbox, {
-layers: ['dams_point_layer']
-});
-if (selectedFeatures.length > 0) alert('some clicked' +selectedFeatures.length )
-})
+
 
 
 
@@ -796,8 +785,8 @@ if (selectedFeatures.length > 0) alert('some clicked' +selectedFeatures.length )
     top:0.1rem;
     position: relative;
     padding: 10px;
-    background-color: rgb(67, 67, 197);
-    color:white;
+    font-weight: bold;
+    color:blue;
   }
    .main-map-overlay.center{
         text-transform: uppercase;
@@ -831,7 +820,8 @@ if (selectedFeatures.length > 0) alert('some clicked' +selectedFeatures.length )
     border: 1px solid grey;
     font-size: 13px;
     right: 40vw;
-    bottom: 6%;
+    bottom: 2%;
+    font-size: .6rem;
 
   }
 
@@ -856,15 +846,15 @@ if (selectedFeatures.length > 0) alert('some clicked' +selectedFeatures.length )
     border: 1px solid white;
 
 
-    padding: 10px;
+    padding: 5px;
     overflow-y: auto;
     width: auto;
-    min-width: 100px;
+    max-width: 100px;
     height: auto;
     border: 1px solid grey;
-    font-size: 13px;
+    font-size: .8rem;
     right: 15px;
-    bottom: 6%;
+    bottom: 2%;
 
   }
   :global(.maplibregl-popup-tip.mapboxgl-popup-tip)

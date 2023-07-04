@@ -52,6 +52,7 @@ let thresholdScale = {domain:[16, 25, 40, 60, 100],
         padding: 5px;
         display: flex;
     }
+    
     .scale_color 
     {
       margin-top: 5px;
