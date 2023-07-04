@@ -258,8 +258,13 @@ function satellite() {
 
           attributionControl: false,
       });
+map.fitBounds([
+              
+              [-1.26277, 40.48],
+              [5.262772989362, 42.8961838]
 
-
+          ])
+ 
       map.on("load", function() {
         //console.log(map.getBounds())
           map.addControl(new NavigationControl(), "top-right");
@@ -808,7 +813,7 @@ function satellite() {
 .circles_info {
     position: absolute;
     z-index: 9999999;
-    background: black;
+    background: #00000069;
     border: 1px solid white;
 
 
