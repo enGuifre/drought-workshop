@@ -5,8 +5,8 @@
 	import { backInOut } from 'svelte/easing';
 	
 	export let perc_volume;
-	export let dia;
-	export let delTime;
+	/* export let dia;
+	export let delTime; */
 	
 	let color='#5959dc';
 	const progress = tweened(100, {

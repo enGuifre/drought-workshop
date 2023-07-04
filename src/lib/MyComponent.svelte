@@ -3,7 +3,7 @@
 	import LineChart from './Charts/LineChart.svelte';
     
     export let data;
-	export let points_data;
+	/* export let points_data; */
     export let prevYearData;
     console.log(data)
     
@@ -18,7 +18,7 @@
       {#each data as {perc_volume, dia,vol_hm3}}
       <div style='color:gold'>{dia}</div>
       <PopupBar {perc_volume} 
-                          {dia}
+                          
                           
                       
                           />
@@ -29,9 +29,9 @@
     {/if}	 
 
     
-	{#if points_data}
+	<!-- {#if points_data}
 		<LineChart data={points_data}/>
-	{/if}
+	{/if} -->
     {#if prevYearData}
     <button on:click={() => {
         

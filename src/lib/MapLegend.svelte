@@ -52,24 +52,25 @@ let thresholdScale = {domain:[16, 25, 40, 60, 100],
         padding: 5px;
         display: flex;
     }
-    
+
     .scale_color 
     {
       margin-top: 5px;
-        width: 16px;
-      height: 15px;
+      width: 0.7rem;
+    height: 0.7rem;
       border-radius: 50%;
       display: inline-block;
-      margin-left: 5px;
+      /* margin-left: 5px; */
     
     }
     .scale_value
     {
+      font-size: .7rem;
         width: 80%;
       height: auto;
       border-radius: 50%;
       display: inline-block;
-      margin-left: 5px;
+      /* margin-left: 5px; */
       float: right;
     
     }

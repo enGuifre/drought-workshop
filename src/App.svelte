@@ -105,7 +105,7 @@ let prevYearInfo;
   }
   :global(.maplibregl-popup .title)
 {
-  font-size: 1.3rem;
+  font-size: 1rem;
   text-align: center;
   margin-bottom: 5px;
 }
@@ -178,7 +178,7 @@ let prevYearInfo;
   :global(.maplibregl-popup-content) 
   {
     border: 1.5px solid white;
-    min-width: 250px;
+    /* max-width: 100px; */
   }
   :global(.mapboxgl-popup-anchor-top .mapboxgl-popup-tip, .maplibregl-popup-anchor-top .maplibregl-popup-tip,
   .mapboxgl-popup-anchor-top-right .mapboxgl-popup-tip, .maplibregl-popup-anchor-top-right .maplibregl-popup-tip
@@ -209,8 +209,7 @@ let prevYearInfo;
 }
  
   :global(.maplibregl-popup) {
-    max-width: unset!important;
-    width: 300px;
+    max-width: 40%!important;
     z-index: 111111111;
   }
   :global(.maplibregl-popup-content) {

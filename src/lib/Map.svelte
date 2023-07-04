@@ -246,24 +246,25 @@ function satellite() {
           
           center: [2,41.702533],
 
-          zoom: 7.5,
+          zoom: 6.3,
           //5.262772989362219, lat: 42.8961838
-           maxBounds: [
+   /*     maxBounds: [
 
               
               [-1.26277, 40.48],
               [5.262772989362, 42.8961838]
 
-          ], 
+          ],   */
 
           attributionControl: false,
       });
-map.fitBounds([
+// map.fitBounds([
               
-              [-1.26277, 40.48],
-              [5.262772989362, 42.8961838]
+//               [-1.26277, 40.48],
+//               [5.262772989362, 42.8961838]
 
-          ])
+//           ]);
+//           map.setZoom(6.3);
  
       map.on("load", function() {
         //console.log(map.getBounds())
@@ -429,13 +430,13 @@ map.fitBounds([
       let popup = new Popup({
           closeButton: false,
           closeOnClick: true,
-        anchor:'left',
-          offset: {
+         anchor:'left', 
+      /*     offset: {
               bottom: [0, 0],
               top: [0, 0],
               "top-left": [0, 0], //[linearOffset, (markerHeight - markerRadius - linearOffset) * -1],
               "top-right": [0, 0], //[-linearOffset, (markerHeight - markerRadius - linearOffset) * -1],
-          },
+          }, */
       });
 
 
@@ -485,6 +486,7 @@ map.fitBounds([
 
                   let coords = features[0].geometry.coordinates;
                   let latlng = new LngLat(coords[0], coords[1])
+                  map.flyTo({center:latlng, zoom: 7.5});
                   setTimeout(function()
                   {
                       popup.addTo(map);
@@ -581,13 +583,15 @@ map.fitBounds([
           
                     selected_info = features[0].properties;
                     console.log(e)      
-          console.warn(selected_info)
+        
                    
                     historical_data=searchRecord(historical.filter((d, i) => {
                             return String(d.codi) == String(selected_info.CODI_ACA) && d.dia.split('/')[2] == year - 1;
                           }), String(format_date(day) + '/' + format_date(month) + '/') + String(year - 1))
-                 console.log(historical_data)       
-      
+                   
+                          console.warn(selected_info)
+          console.log(historical_data)     
+          
           if (features && features.length > 0) {
 
               if (current_code && selected_info.CODI_ACA == current_code) {
@@ -619,6 +623,8 @@ map.fitBounds([
                       </div>
                       
                       <div class='see_satellite_container'></div>
+                      <div class='see_satellite_container'></div>
+                      
                       
 
                       
@@ -627,6 +633,8 @@ map.fitBounds([
                   //  var latlng = e.lngLat;
                   let coords = features[0].geometry.coordinates;
                   let latlng = new LngLat(coords[0], coords[1])
+
+                  map.flyTo({center:latlng, zoom: 7.5});
                   //console.info(latlng)
                   
                   setTimeout(function()
@@ -635,6 +643,8 @@ map.fitBounds([
                   
                       popup.addTo(map);
                       popup.setLngLat(latlng);
+
+                      
 
                       //how in svelte... create new component... complicated
                       jQuery('.close_popup').click(function() {
@@ -661,7 +671,7 @@ map.fitBounds([
                         });
 
 
-                      //console.warn(historical_data)
+                      if (historical_data.perc_volume) {
                           element = document.getElementsByClassName('prev_perc_bar_class')[0]
                           //console.log(historical_data.perc_volume,historical_data.dia)
 
@@ -676,8 +686,9 @@ map.fitBounds([
                               }]
                           }
                       });
+                    }
 
-                     /*  var element = document.createElement("div");
+                    /*  var element = document.createElement("div");
                       element.classList.add('chart');
                       var f = document.getElementsByClassName('lineChart_container')[0]
                       f.appendChild(element);
@@ -697,7 +708,7 @@ map.fitBounds([
                                   }, ...month_historical_data]
                               }
                           }
-                      }); */
+                      });  */
 
                       var element = document.createElement("div");
                       element.classList.add('see_satellite');
@@ -777,7 +788,7 @@ map.fitBounds([
   <MapLegend {thresholdScale}/>
   
   </div>
-  <div class="circles_info">Mida dels cercles proporcional a la capacitat màxima<br>Cercles depenents d'ACA amb la vora blanca</div>
+  <div class="circles_info"><span>Mida dels cercles proporcional a la capacitat màxima</span><span>Cercles depenents d'ACA amb la vora blanca</span></div>
   <div class="main-map-overlay center"><div>Nivell principals embassaments</div></div>
   <div class="map" id="map" />
 </div>
@@ -789,9 +800,9 @@ map.fitBounds([
   {
     top:0.1rem;
     position: relative;
-    padding: 10px;
+    
     font-weight: bold;
-    color:blue;
+    color:#5959dc;
   }
    .main-map-overlay.center{
         text-transform: uppercase;
@@ -802,14 +813,17 @@ map.fitBounds([
     /* background: black;
     border: 1px solid white; */
     
-    padding: 10px;
+    
     left: 0; 
   right: 0; 
   margin-left: auto; 
   margin-right: 10%; 
   width: 85%; /* Need a specific value to work */
   }
-
+  .circles_info span
+  {
+    display: block;
+  }
 .circles_info {
     position: absolute;
     z-index: 9999999;
@@ -817,7 +831,7 @@ map.fitBounds([
     border: 1px solid white;
 
 
-    padding: 10px;
+    padding: .3rem;
     overflow-y: auto;
     width: auto;
     min-width: 100px;
