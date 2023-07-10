@@ -6,6 +6,9 @@
   import Map_compare from "./lib/Map_compare.svelte";
 
 //  import api_data from "./data/fsensors.json";
+  import reservoirs_CHE from "./data/reservoirs_CHE.json";
+  import historical from "./data/historical.json";
+    
   import { onMount } from 'svelte';
   import csvtojson from 'csvtojson';
   import {csv} from 'd3-fetch'
@@ -13,8 +16,10 @@
   let w;
   
   let api_data;
+  let api_data_CHE;
   
   let loading = true;
+  //console.log(reservoirs_CHE);
 
 async function fetchSpreadsheetData() {
   try {
@@ -34,6 +39,45 @@ async function fetchSpreadsheetData() {
             observations : [{...d[1][d[1].length-1], location :''}]
           }))
 
+    const id_CHE = '1QA_OBi0XtXeJ6BIr7MGV2olnW4JcmpFSmENjHfl9vuY';
+    const file_CHE = `spreadsheets/u/1/d/${id_CHE}/export?format=csv&id=${id_CHE}&gid=${gid}`
+    const url_CHE = `${base}/${file_CHE}`;
+    let data_CHE = await csv(url_CHE); 
+    api_data_CHE = reservoirs_CHE.map(d => {
+      let abs_value = "-1";
+        let perc_value = "-1";
+        let date = "01/01/1970";
+        let prev_abs_value = "-1";
+        let prev_perc_value = "-1";
+        let prev_date = "01/01/1970";
+        let filtered_data_CHE = data_CHE.filter(dc => dc.Sensor === d.nivell_absolut);
+        //assuming from oldest to newest
+        if(filtered_data_CHE){
+          abs_value = filtered_data_CHE[filtered_data_CHE.length -1].Value.replace(/,/g, '.'); //replace comma by dot
+          date = filtered_data_CHE[filtered_data_CHE.length -1].Time.substring(0, 10);
+          //for now we take the first data item as a reference -> It should be one year before
+          prev_abs_value = filtered_data_CHE[0].Value.replace(/,/g, '.'); //replace comma by dot
+          prev_date = filtered_data_CHE[0].Time.substring(0, 10);
+        }
+        filtered_data_CHE = data_CHE.filter(dc => dc.Sensor === d.nivell_perc);
+        //assuming from oldest to newest
+        if(filtered_data_CHE){
+          perc_value = filtered_data_CHE[filtered_data_CHE.length -1].Value.replace(/,/g, '.'); //replace comma by dot
+          prev_perc_value = filtered_data_CHE[0].Value.replace(/,/g, '.'); //replace comma by dot
+        }
+        let dd =({
+          ...d,
+          dia: date,
+          Dia: date,
+          perc_volume: +perc_value,
+          vol_hm3: +abs_value,
+          prev_dia: prev_date,
+          prev_perc_volume: +prev_perc_value,
+          prev_vol_hm3: +prev_abs_value
+        });
+        return dd;
+    });
+    //console.log(api_data_CHE);
   } catch (error) {
     console.error('Error fetching spreadsheet data:', error);
   } finally {
@@ -71,7 +115,7 @@ let prevYearInfo;
     map_compare = event.detail.map_compare;
     console.warn('closeSatelliteEvent',map_compare)
 });
-  console.warn(map_compare)
+  //console.warn(map_compare)
 
 // setTimeout(function() {
 //   map_compare=true;
@@ -81,7 +125,7 @@ let prevYearInfo;
   <section>
     {#if !map_compare || map_compare==false}
       {#if api_data}
-        <Map {api_data}/> 
+        <Map {api_data} {api_data_CHE}/> 
       {:else}
         <div>Loading...</div>
       {/if}

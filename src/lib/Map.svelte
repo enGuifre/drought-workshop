@@ -20,8 +20,11 @@
   import { each } from "svelte/internal";
   import MyComponent from "./MyComponent.svelte";
   import MapLegend from "./MapLegend.svelte";
+  import {csv} from 'd3-fetch'
 
   export let api_data;
+  export let api_data_CHE;
+
   let map_compare;
 
   //console.info(reservoirs_not_aca_data);
@@ -98,7 +101,10 @@
     
 
     return d;
-}); 
+});
+//let filtered_reservoirs_not_aca_data = api_data_CHE;
+
+//console.log(filtered_reservoirs_not_aca_data);
 
 let date = new Date();
 let day = date.getDate();
@@ -449,18 +455,43 @@ function satellite() {
               let info = features[0].properties;
               //console.log(info)
               
-              let f = filtered_reservoirs_not_aca_data.filter((d, i) => {
+              let ff = api_data_CHE.find( d => d.Codi_ACA === info.CODI_ACA);
+              //console.log(ff);
+
+              /*let f = filtered_reservoirs_not_aca_data.filter((d, i) => {
 
                   return String(d.Codi_ACA) === String(info.CODI_ACA)
-              })
+              })*/
+
 
               let data = {};
               //using fixed date because we do not have other info (from api)
-              data.currentData = searchRecord(f, '03/05/2023');
+              //data.currentData = searchRecord(f, '08/07/2023');
+              data.currentData = ({
+                name: ff.name,
+                Codi_ACA:ff.Codi_ACA,
+                cap_hm3:ff.cap_hm3,
+                dia:ff.dia,
+                Dia:ff.dia,
+                perc_volume:ff.perc_volume,
+                vol_hm3:ff.vol_hm3
+              });
 
-              data.prevData = searchRecord(f, '03/05/2022');
+              //data.prevData = searchRecord(f, '08/07/2022');
+              data.prevData = ({
+                name: ff.name,
+                Codi_ACA:ff.Codi_ACA,
+                cap_hm3:ff.cap_hm3,
+                dia:ff.prev_dia,
+                Dia:ff.prev_dia,
+                perc_volume:ff.prev_perc_volume,
+                vol_hm3:ff.prev_vol_hm3
+              });
 
-              //console.log(data)
+
+              //console.log("data");
+              //console.log(data);
+              //console.log(api_data_CHE);
 
 
               if (data.currentData) {
@@ -582,15 +613,15 @@ function satellite() {
 
           
                     selected_info = features[0].properties;
-                    console.log(e)      
+                    //console.log(e)      
         
                    
                     historical_data=searchRecord(historical.filter((d, i) => {
                             return String(d.codi) == String(selected_info.CODI_ACA) && d.dia.split('/')[2] == year - 1;
                           }), String(format_date(day) + '/' + format_date(month) + '/') + String(year - 1))
                    
-                          console.warn(selected_info)
-          console.log(historical_data)     
+                          //console.warn(selected_info)
+          //console.log(historical_data)     
           
           if (features && features.length > 0) {
 
@@ -606,6 +637,7 @@ function satellite() {
               }
 
               
+              //console.log("historical_data")
               //console.log(historical_data)
 
           
