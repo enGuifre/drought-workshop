@@ -7,7 +7,7 @@
 
 //  import api_data from "./data/fsensors.json";
   import reservoirs_CHE from "./data/reservoirs_CHE.json";
-  import historical from "./data/historical.json";
+  import historical from "./data/reservoirs_not_aca_data.json";
     
   import { onMount } from 'svelte';
   import csvtojson from 'csvtojson';
@@ -19,7 +19,19 @@
   let api_data_CHE;
   
   let loading = true;
-  //console.log(reservoirs_CHE);
+
+  //Get data from one year ago for not_aca reservoirs
+  //console.log(historical);
+  let now = new Date();
+  let day = now.getDate();
+  let month = now.getMonth() + 1;
+  let year = now.getFullYear();
+  day = parseInt(day,10);
+  month = parseInt(month,10);
+  year--;
+  const oneYearAgo = day+"/"+month+"/"+year;
+  //console.log(oneYearAgo);
+  let filteredHist = historical.filter(dh => dh.Dia === oneYearAgo);
 
 async function fetchSpreadsheetData() {
   try {
@@ -49,22 +61,31 @@ async function fetchSpreadsheetData() {
         let date = "01/01/1970";
         let prev_abs_value = "-1";
         let prev_perc_value = "-1";
-        let prev_date = "01/01/1970";
+        let prev_date = oneYearAgo; //Computed on the top
         let filtered_data_CHE = data_CHE.filter(dc => dc.Sensor === d.nivell_absolut);
         //assuming from oldest to newest
         if(filtered_data_CHE){
           abs_value = filtered_data_CHE[filtered_data_CHE.length -1].Value.replace(/,/g, '.'); //replace comma by dot
           date = filtered_data_CHE[filtered_data_CHE.length -1].Time.substring(0, 10);
           //for now we take the first data item as a reference -> It should be one year before
-          prev_abs_value = filtered_data_CHE[0].Value.replace(/,/g, '.'); //replace comma by dot
-          prev_date = filtered_data_CHE[0].Time.substring(0, 10);
+          //prev_abs_value = filtered_data_CHE[0].Value.replace(/,/g, '.'); //replace comma by dot
+          //prev_date = filtered_data_CHE[0].Time.substring(0, 10);
         }
         filtered_data_CHE = data_CHE.filter(dc => dc.Sensor === d.nivell_perc);
         //assuming from oldest to newest
         if(filtered_data_CHE){
           perc_value = filtered_data_CHE[filtered_data_CHE.length -1].Value.replace(/,/g, '.'); //replace comma by dot
-          prev_perc_value = filtered_data_CHE[0].Value.replace(/,/g, '.'); //replace comma by dot
+          //prev_perc_value = filtered_data_CHE[0].Value.replace(/,/g, '.'); //replace comma by dot
         }
+          //from the historical data
+        let historicalItem = filteredHist.filter(dh => dh.Codi_ACA === d.Codi_ACA);
+        //console.log(historicalItem)
+        if(historicalItem){
+          prev_abs_value = historicalItem[0].vol_hm3;
+          prev_perc_value = historicalItem[0].perc_volume;
+        }
+
+
         let dd =({
           ...d,
           dia: date,
@@ -86,6 +107,11 @@ async function fetchSpreadsheetData() {
 }
 
 onMount(fetchSpreadsheetData);
+
+function findBasedOnNameAndDate(histArray, name, date){
+
+  return "TO DO";
+}
 
 let map_compare;
 let currentInfo;

@@ -453,10 +453,10 @@ function satellite() {
 
           if (features && features.length > 0) {
               let info = features[0].properties;
-              //console.log(info)
+              console.log(info)
+              console.log(api_data_CHE);
               
               let ff = api_data_CHE.find( d => d.Codi_ACA === info.CODI_ACA);
-              //console.log(ff);
 
               /*let f = filtered_reservoirs_not_aca_data.filter((d, i) => {
 
