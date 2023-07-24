@@ -119,8 +119,8 @@ let year = date.getFullYear();
 
       afterMap.on('moveend',function()
       {
-
-        if (!afterMapLoading) return;
+        //make sure it starts counting only after the zoom has finished
+     
         setTimeout(function () {
             if (beforeMapLoading || afterMapLoading)
             {
@@ -134,7 +134,7 @@ let year = date.getFullYear();
             if (beforeMapLoading || afterMapLoading)
             {
               
-              loadingContainer.textContent='Hi ha hagut un error en la font de dades. Torna-ho a intentar més tard';
+              loadingContainer.textContent='Hi ha hagut un retràs important en la font de dades. Torna-ho a intentar més tard o continua a la espera';
             }
             
           }, 25000);   
@@ -359,7 +359,7 @@ function destroyComponent() {
 {
   width: 80%;
   background-color: tomato;
-  /* opacity: 0%; */
+   opacity: 0%; 
 }
 
 .box.loading.visible
