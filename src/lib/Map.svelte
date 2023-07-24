@@ -95,6 +95,12 @@
         .join("/");
       isNaN(d.perc_volume)?d.perc_volume = Number(d.perc_volume.replace(",", ".")):d.perc_volume;
       isNaN(d.vol_hm3)? d.vol_hm3 = Number(d.vol_hm3.replace(',','.')):d.vol_hm3;
+     /* ex: Riba roja
+       "cap_hm3": "209,56",
+    "Codi_ACA": "E1040",
+    "Dia": "1/1/2000",
+    "vol_hm3": "190,25",
+    "perc_volume": "90,79" */
     
 
     return d;
@@ -107,6 +113,7 @@ let year = date.getFullYear();
 let currentDate = `${day}/${month}/${year}`;
 
 
+
 let visible_centroids = dams_centroid.features.filter((d) => sensors_arr.indexOf(String(d.properties.CODI_ACA)) > -1);
 let not_aca_centroids = dams_centroid.features.filter((d) => non_aca_codes_arr.indexOf(String(d.properties.CODI_ACA)) > -1);
 
@@ -115,12 +122,13 @@ not_aca_centroids.map((d) => {
     return d2.Codi_ACA == d.properties.CODI_ACA;
   })[0];
   if (data) {
-    //console.warn(data.cap_hm3,isNaN(data.cap_hm3))
+   
+console.log(data)
     d.properties.volume = data.vol_hm3;
-    //d.properties.capacity = data.cap_hm3/1000;
+  
     if (isNaN(data.cap_hm3))
     {
-      d.properties.capacity = Number(data.cap_hm3.replace(',','.'))/1000;
+      d.properties.capacity = Number(data.cap_hm3.replace(',','.'));
     }
     else
     {

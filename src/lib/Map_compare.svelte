@@ -12,6 +12,7 @@ import Compare from "@maplibre/maplibre-gl-compare";
   import { mapStyle } from "../data/mapStyle";
   import { dams_bbox } from "../data/dams_bbox.js";
   import { detach_before_dev } from "svelte/internal";
+  import { map } from "d3-array";
 
    let beforeMap;
    let icgc_sat_prev;
@@ -24,6 +25,9 @@ let coords;
 let afterMap;
 let prevYearInfo_label_classes;
 let currentYearInfo_label_classes;
+let beforeMapLoading=true;
+let afterMapLoading=true;
+let loadingContainer;
 if (currentInfo)
 {
   console.info(currentInfo)
@@ -37,17 +41,19 @@ if (currentInfo)
 }
 let day = date.getDate();
 let month = (date.getMonth())<10?`0${date.getMonth()}`:date.getMonth();
-
+/*
 let prev_month;
-     if (+day<15)
+    if (+day<22)
      {
-      
-      prev_month=`0${+date.getMonth()-1}`
+      prev_month=`0${+date.getMonth()-1}
+      `
      }
      else
      {
       prev_month=month;
-     }
+     } 
+     */
+  let  prev_month=`0${+date.getMonth()-2}`;
 console.warn(prev_month)
 let year = date.getFullYear();
     let currentDate = `${day}/${month}/${year}`;
@@ -69,7 +75,10 @@ let year = date.getFullYear();
           beforeMap.style.sourceCaches['icgc_sat_source_prev'].update(beforeMap.transform)
 
           // Force a repaint, so that the map will be repainted without you having to touch the map
-          beforeMap.triggerRepaint()
+          beforeMap.triggerRepaint();
+          console.log('selectedSatelliteYear')
+
+       
                       
       }
 
@@ -89,7 +98,7 @@ let year = date.getFullYear();
               currentYearInfo_label_classes='red percent'
 
 
-              
+   
 
               
     beforeMap = new Map({
@@ -107,17 +116,32 @@ let year = date.getFullYear();
           center:[1.05, 41.4],
         zoom: 7
       });
+
+      afterMap.on('moveend',function()
+      {
+
+        if (!afterMapLoading) return;
+        setTimeout(function () {
+            if (beforeMapLoading || afterMapLoading)
+            {
+              
+              loadingContainer.textContent='La càrrega dels mapes sembla que va lenta...';
+            }
+            
+          }, 8000);       
+          
+        setTimeout(function () {
+            if (beforeMapLoading || afterMapLoading)
+            {
+              
+              loadingContainer.textContent='Hi ha hagut un error en la font de dades. Torna-ho a intentar més tard';
+            }
+            
+          }, 25000);   
+      })
       beforeMap.on("load", function () {
 
-        //sau 
-        // 2.337, "xmax": 2.415, "y_min": 41.963, "y_max": 42
 
-    
-
-      beforeMap.fitBounds([
-     coords[1], // southwestern corner of the bounds
-     coords[0] // northeastern corner of the bounds
-     ]);
  
      let month = (date.getMonth())<10?`0${date.getMonth()}`:date.getMonth();
      //let day = date.getDate();
@@ -144,8 +168,22 @@ let year = date.getFullYear();
     ],
     'tileSize': 512,
   
-    })
+    });
 
+
+  
+
+    afterMap.on('idle',function()
+    {
+      
+      afterMapLoading=false;
+    }) 
+
+    beforeMap.on('idle',function()
+    {
+      
+      beforeMapLoading=false;
+    }) 
     icgc_sat_prev={
 
 'id': 'icgc_sat_prev',
@@ -244,17 +282,26 @@ function destroyComponent() {
       }}>
       <MdClear />
     </div>
-    <div class="map-overlay center"><div class="title"><span>{currentInfo.NAME}</span></div>
-      <div class="prevYear">
-        <div class="info"><span class="date">{month}-2022</span><span 
-          class="{prevYearInfo_label_classes}"> {prevYearInfo.perc_volume}%</span></div>
-      </div>
-
-      <div class="currentYear">
-        <!-- we have to define -2 months for current year bc often missing the satellite images -->
-        <div class="info"><span class="date">{prev_month}-{year}</span><span class="{currentYearInfo_label_classes}"> {currentInfo.percent} %</span></div>
+    <div class="map-overlay center">
+      <div class="flexbox">
+        <div class="prevYear box">
+          <div class="info"><span class="date">{month}-2022</span><span 
+            class="{prevYearInfo_label_classes}"> {prevYearInfo.perc_volume}%</span></div>
+        </div>
         
+        <div class="loading box" bind:this={loadingContainer} class:visible={(beforeMapLoading || afterMapLoading)}>
+        
+          <span>Carregant mapes...</span>
+        
+        </div>
+          
+        <div class="currentYear box">
+          <!-- we have to define -2 months for current year bc often missing the satellite images -->
+          <div class="info"><span class="date">{prev_month}-{year}</span><span class="{currentYearInfo_label_classes}"> {currentInfo.percent.toFixed(1)} %</span></div>
+          
+        </div>
       </div>
+    <!--  -->
     </div>
    
     
@@ -281,6 +328,44 @@ function destroyComponent() {
         user-select: none;
       }
 
+      .flexbox
+{
+    
+     display: flex;
+    padding: 6px 0;
+    
+    
+    width: 100%;
+}
+
+.box {
+    height: auto;
+    width: auto;
+    
+    font-size: .8rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+ color: white;
+ font-weight: 500;
+}
+.box.currentYear,.box.prevYear
+{
+  width:auto;
+  margin-right: 1rem;
+  margin-left: 1rem;
+}
+.box.loading 
+{
+  width: 80%;
+  background-color: tomato;
+  /* opacity: 0%; */
+}
+
+.box.loading.visible
+{
+  opacity: 100%;
+}
       .map {
         position: absolute;
         top: 0;
@@ -293,9 +378,9 @@ function destroyComponent() {
       }
       .info .percent
       {
-        font-size: 2rem;
+        font-size: 1.2rem;
         
-        margin-left: 10px;
+        
         font-weight: bolder;
       }
       .percent.blue
@@ -308,7 +393,7 @@ function destroyComponent() {
       }
       .info
       {
-        width: fit-content;
+        width: max-content;
     background: #b1a6a6;
     left: 0;
     right: 0;
@@ -327,7 +412,7 @@ function destroyComponent() {
         text-transform: uppercase;
         color:black;
     position: absolute;
-    
+    top:8%;
     z-index: 9999999;
     /* background: black;
     border: 1px solid white; */
@@ -340,48 +425,7 @@ function destroyComponent() {
   margin-right: auto; 
   width: 100%; /* Need a specific value to work */
   }
-  div.prevYear 
-  {
-    float: left;
-    width: 50%;
-    text-align: center;
-  }
-  div.currentYear
-  {
-    float: left;
-    width: 50%;
-    text-align: center;
-  }
- 
-  .map-overlay.prevYear{
-    position: absolute;
-    z-index: 9999999;
-    background: black;
-    border: 1px solid white;
-    
-
-    padding: 10px;
-    overflow-y: auto;
-    width: 180px;
-    border: 1px solid grey;
-    font-size: 13px;
-  }
-  .map-overlay.currentYear{
-      position: absolute;
-      z-index: 9999999;
-      background: black;
-      border: 1px solid white;
-      
   
-      padding: 10px;
-      overflow-y: auto;
-      width: 180px;
-      border: 1px solid grey;
-      font-size: 13px;
-      right: 15px;
-      top: 2%;
-    }
-    
     .map-overlay-close:hover 
     {
       cursor: pointer;
@@ -390,21 +434,32 @@ function destroyComponent() {
     position: absolute;
     z-index: 11119999999;
     padding: 1px;
-    width: 55px;
+    width: 1.5rem;
     color: white;
     background-color: black;
     border: 2px solid gray;
-    font-size: 13px;
-    right: 15px;
-    top: 2%;
+    
+    right: 1rem;
+    top: .5rem;
 }
 
-
+.map-overlay .loadingss
+{
+  padding: 1.5rem;
+    background: rgb(65 65 186);
+    color: rgba(255, 255, 255, 0.85);
+    font-weight: bold;
+    position: absolute;
+    justify-content: center;
+    max-width: 30vw;
+    left: 42%;
+    border: 1px solid white;
+}
 .map-overlay .title
   {
     
     color:goldenrod;
-    font-size: 2rem;
+    font-size: 1.2rem;
     font-weight: bold;
   }
 
