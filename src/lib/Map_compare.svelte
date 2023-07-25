@@ -40,31 +40,31 @@ if (currentInfo)
  
 }
 let day = date.getDate();
-let month = (date.getMonth())<10?`0${date.getMonth()}`:date.getMonth();
 /*
-let prev_month;
-    if (+day<22)
-     {
-      prev_month=`0${+date.getMonth()-1}
-      `
-     }
-     else
-     {
-      prev_month=month;
-     } 
-     */
-  let  prev_month=`0${+date.getMonth()-1}`;
-console.warn(prev_month)
+The getMonth() method of Date instances returns the month for this date according to local time, 
+as a zero-based value (where zero indicates the first month of the year).
+*/
+//January is 0+1
+//August is 7+1
+//october is 9+1
+let month_number = date.getMonth()+1;
+
+let month = (month_number)<10?`0${month_number}`:month_number;
+
+//we substract 2 in order to be sure that we can get some info (previous month is not always available)
+let prev_month = (month_number-2)<10?`0${month_number-2}`:month_number-2;
+
+
 let year = date.getFullYear();
     let currentDate = `${day}/${month}/${year}`;
-    let prevDate=`${day}/${month}/${year-1}`;
+    let prevDate=`${day}/${prev_month}/${year-1}`;
 
    $:{
       if (selectedSatelliteYear) {
        
-        
+        //For the last year we should have all info, so we simply use month
               // Set the tile url to a cache-busting url (to circumvent browser caching behaviour):sen2irc_202304
-              beforeMap.getSource('icgc_sat_source_prev').tiles = [ `https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc_${selectedSatelliteYear}${month}&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&WIDTH=126&HEIGHT=126&BBOX={bbox-epsg-3857}`]
+          beforeMap.getSource('icgc_sat_source_prev').tiles = [ `https://geoserveis.icgc.cat/icgc_sentinel2/wms/service?REQUEST=GetMap&SERVICE=WMS&VERSION=1.3.0&LAYERS=sen2irc_${selectedSatelliteYear}${month}&STYLES=&FORMAT=image/jpeg&BGCOLOR=0xFFFFFF&TRANSPARENT=TRUE&CRS=EPSG:3857&WIDTH=126&HEIGHT=126&BBOX={bbox-epsg-3857}`]
             
             
 
@@ -143,10 +143,12 @@ let year = date.getFullYear();
 
 
  
-     let month = (date.getMonth())<10?`0${date.getMonth()}`:date.getMonth();
+     //let month = (date.getMonth())<10?`0${date.getMonth()}`:date.getMonth();
      //let day = date.getDate();
   
      console.info(`sen2irc_${year-1}${prev_month}`)
+
+     //For the this year we may not still have ready last month data, this is why we substracted 2 to 'month'
       afterMap.addSource('icgc_sat_source_now', {
     
     'type': 'raster',
