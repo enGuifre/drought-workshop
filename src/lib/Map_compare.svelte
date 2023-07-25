@@ -53,7 +53,7 @@ let prev_month;
       prev_month=month;
      } 
      */
-  let  prev_month=`0${+date.getMonth()-2}`;
+  let  prev_month=`0${+date.getMonth()-1}`;
 console.warn(prev_month)
 let year = date.getFullYear();
     let currentDate = `${day}/${month}/${year}`;
