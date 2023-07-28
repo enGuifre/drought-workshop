@@ -125,7 +125,7 @@ let year = date.getFullYear();
             if (beforeMapLoading || afterMapLoading)
             {
               
-              loadingContainer.textContent='La càrrega dels mapes sembla que va lenta...';
+              loadingContainer.textContent='La càrrega dels mapes sembla que va lenta. Continua a l\'espera';
             }
             
           }, 8000);       
@@ -134,7 +134,7 @@ let year = date.getFullYear();
             if (beforeMapLoading || afterMapLoading)
             {
               
-              loadingContainer.textContent='Hi ha hagut un retràs important en la font de dades. Torna-ho a intentar més tard o continua a la espera';
+              loadingContainer.textContent='La font de dades va molt lenta. Continua a l\'espera o torna-ho a intentar més tard';
             }
             
           }, 25000);   
